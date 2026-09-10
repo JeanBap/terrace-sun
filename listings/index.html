@@ -111,7 +111,7 @@ Authorization: Bearer YOUR_KEY</code></pre></div>
         <tr><td><code>year</code></td><td>reference year, default current</td></tr>
         <tr><td><code>key</code></td><td>API key, or send <code>Authorization: Bearer</code></td></tr>
       </tbody></table>
-      <h3>Errors</h3><p class="small">400 bad coordinates · 401 missing key · 403 invalid key · 503 building data unavailable (retry after 30 s).</p></div>
+      <h3>Errors</h3><p class="small">400 bad coordinates · 401 missing key · 403 invalid key · 503 building data unavailable: OpenStreetMap's servers did not answer inside our 10 s window, retry after 30 s (results are cached 24 h once computed, so a retry is normally instant). The badge and the report do not depend on this: they compute in the visitor's browser if the API is slow.</p></div>
       <div><h3>Response (trimmed)</h3><pre><code>{
   "sun_score": 76, "grade": "A",
   "annual_avg_direct_sun_hours": 8.9,
