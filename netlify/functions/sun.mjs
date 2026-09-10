@@ -25,7 +25,11 @@ export default async (req, context) => {
 
   const rk = reportKey(p);
   const hit = await cacheGet(rk, 30);
-  if (hit) { await log(200, plan, 'report-cache'); return reply(200, { ...hit, plan, cache: 'hit' }, CACHED); }
+  if (hit) {
+    await log(200, plan, 'report-cache');
+    const report_url = hit.report_url.replace(/&name=[^&]*/, '') + (p.name ? '&name=' + encodeURIComponent(p.name) : '');
+    return reply(200, { ...hit, plan, cache: 'hit', input: { ...hit.input, name: p.name || null }, report_url }, CACHED);
+  }
 
   let json = await cacheGet(osmKey(p.lat, p.lon), 30), src = 'osm-cache';
   if (!json) {
