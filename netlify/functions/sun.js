@@ -18,13 +18,20 @@ async function fetchMirror(url, q, ms) {
     return j;
   } finally { clearTimeout(t); }
 }
-// Synchronous functions get ~10 s, so mirrors are raced in pairs with a tight budget.
+// Synchronous functions get ~10 s. Ways (fast) are required; multipolygon relations (slow to assemble)
+// are fetched in parallel with a shorter budget and merged in when they arrive in time.
 async function overpass(lat, lon) {
   const a = `(around:${RADIUS},${lat.toFixed(6)},${lon.toFixed(6)})`;
-  const q = `[out:json][timeout:8];(way["building"]${a};relation["building"]${a};way["building:part"]${a};way["highway"]["name"](around:90,${lat.toFixed(6)},${lon.toFixed(6)}););out geom;`;
-  // All mirrors at once, first good answer wins; the budget leaves ~1 s for the shadow maths.
-  try { return await Promise.any(MIRRORS.map(u => fetchMirror(u, q, 8500))); }
-  catch (e) { throw new Error('building data unavailable: ' + (e.errors || [e]).map(x => x.message).join('; ')); }
+  const qWays = `[out:json][timeout:8];(way["building"]${a};way["building:part"]${a};way["highway"]["name"](around:90,${lat.toFixed(6)},${lon.toFixed(6)}););out geom;`;
+  const qRels = `[out:json][timeout:6];relation["building"]${a};out geom;`;
+  const race = (q, ms) => Promise.any(MIRRORS.map(u => fetchMirror(u, q, ms)));
+  const [ways, rels] = await Promise.all([
+    race(qWays, 8000).catch(e => { throw new Error('building data unavailable: ' + (e.errors || [e]).map(x => x.message).join('; ')); }),
+    race(qRels, 6500).catch(() => null)
+  ]);
+  if (rels && rels.elements) ways.elements = ways.elements.concat(rels.elements);
+  ways.relations_included = !!rels;
+  return ways;
 }
 
 exports.handler = async (event) => {
@@ -61,7 +68,7 @@ exports.handler = async (event) => {
       building: { floors: rep.floors_in_building, height_m: rep.building_height_m, height_from_osm: rep.building_height_tagged, point_mode: rep.point_mode },
       facades: rep.facades.map((f, i) => Object.assign({ index: i + 1, character: rep.character[i] }, f)),
       seasons: rep.seasons, monthly_best_wall_hours: rep.monthly, floors: rep.floors,
-      data: { source: 'OpenStreetMap (ODbL)', buildings_within_m: RADIUS, buildings_used: rep.buildings_used, share_of_built_area_with_real_height: rep.height_coverage, assumed_height_m: rep.default_height_m },
+      data: { source: 'OpenStreetMap (ODbL)', buildings_within_m: RADIUS, multipolygon_buildings_included: json.relations_included, buildings_used: rep.buildings_used, share_of_built_area_with_real_height: rep.height_coverage, assumed_height_m: rep.default_height_m },
       method: 'Direct-beam sun, clear sky, flat ground, 2.5D shadow casting from OSM building footprints and heights. No trees, awnings or terrain. Wall samples 1.5 m above the chosen floor.',
       compute_ms: Date.now() - t0
     };
