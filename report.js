@@ -44,9 +44,9 @@
       if (height >= 2) E.applyHeights(model, height, true);
       const tz = (window.tzlookup && tzlookup(lat, lon)) || Intl.DateTimeFormat().resolvedOptions().timeZone;
       const rep = E.propertyReport(model, lat, lon, tz, { floor, floors, year, stepMin: 10 });
-      render(model, rep, tz);
       status('');
-      $('doc').hidden = false;
+      $('doc').hidden = false; // show first: Leaflet needs a visible, sized container
+      render(model, rep, tz);
       if (window.tsTrack) window.tsTrack('report_view', agency || '');
     } catch (e) { status(e.message, true); }
   })();
@@ -97,5 +97,9 @@
     const show = h => { const t = t0 + h * 36e5, p = E.sunPosition(t, lat, lon); polys = p.alt > 0.1 * RAD ? E.shadowShapes(model, p.alt, p.az, 300).map(poly => poly.map(q => toLL(q[0], q[1]))) : null; draw(); $('mapCap').textContent = `Shadows at ${String(h).padStart(2, '0')}:00 on 20 March${p.alt > 0 ? `, sun ${Math.round(p.alt / RAD)}° high from the ${DIRS[E.compass(p.az / RAD)]}` : ' (sun below the horizon)'}. Highlighted building is the property; gold lines are its street-facing walls.`; };
     times.forEach(([l, h], i) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'lg' + (i === 1 ? ' on' : ''); b.textContent = l; b.onclick = () => { btns.querySelectorAll('.lg').forEach(x => x.classList.remove('on')); b.classList.add('on'); show(h); }; btns.appendChild(b); });
     show(13);
+    // re-measure once layout settles (fonts, print CSS, late images)
+    setTimeout(() => { map.invalidateSize(); draw(); }, 60);
+    window.addEventListener('resize', () => { map.invalidateSize(); draw(); });
+    window.addEventListener('beforeprint', () => { map.invalidateSize(); draw(); });
   }
 })();

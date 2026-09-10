@@ -9,6 +9,10 @@ Figures are direct-beam sun on a clear day over flat ground, sampled every 10 mi
 - [OpenAPI specification](https://terrace-sun.netlify.app/openapi.json): GET /api/v1/sun?lat&lon&floor&floors&height&name&year&key
 - [Product, pricing and API reference](https://terrace-sun.netlify.app/listings/): Free (5 reports a month), Agent EUR 19/month, Agency EUR 79/month, Portal API EUR 390/month, single report EUR 9
 
+- [How much sun does a home get? The complete guide](https://terrace-sun.netlify.app/blog/how-much-sun-does-a-home-get/index.md): hours of sun by orientation, floor, street width and season for 12 cities; profile angle rule; EN 17037, BRE BR 209, DIN 5034-1 and Italian DM 1975; buyer checklist; glossary; FAQ
+- [Sun hours by city](https://terrace-sun.netlify.app/sun-hours/): Rome, Milan, Florence, Naples, Madrid, Barcelona, Lisbon, Athens, Paris, London, Amsterdam, Berlin
+- [Open data (JSON)](https://terrace-sun.netlify.app/data/sun-hours-cities.json), [CSV by orientation](https://terrace-sun.netlify.app/data/sun-hours-by-orientation.csv), [CSV by floor and street](https://terrace-sun.netlify.app/data/sun-hours-by-floor-and-street.csv)
+
 ## Tools
 - [Sun exposure API](https://terrace-sun.netlify.app/api/v1/sun?lat=41.8799368&lon=12.4768852&floor=5&floors=6&key=demo): JSON; key "demo" works for testing
 - [Report page](https://terrace-sun.netlify.app/report/?lat=41.8799368&lon=12.4768852&floor=5&floors=6&name=Example): /report/?lat&lon&floor&floors&name&agency&logo&agent

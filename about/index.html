@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About Terrace Sun: method, data and author</title>
+<meta name="description" content="Who builds Terrace Sun, how sun exposure is calculated from OpenStreetMap buildings, what is checked and what is not included.">
+<link rel="canonical" href="https://terrace-sun.netlify.app/about/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Yanni Papoutsi">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Terrace Sun">
+<meta property="og:title" content="About Terrace Sun: method, data and author">
+<meta property="og:description" content="Who builds Terrace Sun, how sun exposure is calculated from OpenStreetMap buildings, what is checked and what is not included.">
+<meta property="og:url" content="https://terrace-sun.netlify.app/about/">
+<meta property="og:image" content="https://terrace-sun.netlify.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="alternate" type="application/rss+xml" title="Terrace Sun blog" href="/blog/feed.xml">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='26' fill='%23f0a202'/></svg>">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/blog.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "AboutPage",
+   "name": "About Terrace Sun",
+   "url": "https://terrace-sun.netlify.app/about/",
+   "publisher": {
+    "@type": "Organization",
+    "name": "Terrace Sun",
+    "url": "https://terrace-sun.netlify.app/",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://terrace-sun.netlify.app/og.png",
+     "width": 1200,
+     "height": 630
+    }
+   }
+  },
+  {
+   "@type": "Person",
+   "name": "Yanni Papoutsi",
+   "jobTitle": "Founder",
+   "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Rome",
+    "addressCountry": "IT"
+   },
+   "url": "https://terrace-sun.netlify.app/about/",
+   "worksFor": {
+    "@type": "Organization",
+    "name": "Terrace Sun",
+    "url": "https://terrace-sun.netlify.app/"
+   }
+  }
+ ]
+}
+</script>
+</head>
+<body class="blog">
+<header class="top"><div class="wrap titlerow"><a class="brandlink" href="/"><span class="sun" aria-hidden="true"></span>Terrace Sun</a>
+<nav class="topnav" aria-label="Main"><a href="/">Check a spot</a><a href="/listings/" data-track="nav_listings">For estate agents</a><a href="/sun-hours/">Sun hours by city</a><a href="/blog/">Blog</a><a href="/rome-sunny-cafes/">Rome cafés</a></nav></div></header>
+<main class="wrap post"><nav class="crumbs small muted" aria-label="Breadcrumb"><a href="/">Terrace Sun</a> › <span>About</span></nav><article><h1 id="about-terrace-sun">About Terrace Sun</h1>
+<p>Terrace Sun calculates how much direct sun reaches a place: a café terrace, the windows of a flat on a given floor, a roof, a wedding spot or a bench. It started in Rome, as a way to find the sunniest café tables in Testaccio, and grew into a tool for buyers, estate agents, portals and AI assistants.</p>
+<h2 id="who-is-behind-it">Who is behind it</h2>
+<p>Terrace Sun is built by <strong>Yanni Papoutsi</strong>, a founder and author based in Rome who works on data tools for property and short-term rentals.</p>
+<h2 id="how-the-numbers-are-made">How the numbers are made</h2>
+<ul>
+<li><strong>Buildings:</strong> footprints and heights from OpenStreetMap within 250 m of the location. Where a height is missing, a typical local height is assumed and the result says so.</li>
+<li><strong>Sun position:</strong> the standard Meeus model used by SunCalc, with atmospheric refraction.</li>
+<li><strong>Shadows:</strong> 2.5D ray casting every 5 or 10 minutes from sunrise to sunset, at street level, at table height, or 1.5 m above each floor on each street-facing wall.</li>
+<li><strong>Checked against:</strong> the open-source cityshade model; floor-by-floor wall hours on a real Rome building matched to within 0.1 hour.</li>
+<li><strong>Not included:</strong> trees, awnings, balconies above, terrain and clouds.</li>
+</ul>
+<h2 id="guides-and-data">Guides and data</h2>
+<ul>
+<li><a href="/blog/how-much-sun-does-a-home-get/">How much sun does a home get? The complete guide</a></li>
+<li><a href="/blog/sun-exposure-property-listings/">Sun exposure in property listings</a></li>
+<li><a href="/sun-hours/">Sun hours by city</a> and the <a href="/data/sun-hours-cities.json">open data</a></li>
+<li><a href="/openapi.json">API and OpenAPI specification</a></li>
+</ul>
+<h2 id="contact">Contact</h2>
+<p>Use the <a href="/listings/#signup">key request form</a> for API keys, partnerships and corrections.</p></article></main><footer class="wrap foot muted"><p>Terrace Sun · <a href="/">Check any spot</a> · <a href="/listings/">For estate agents</a> · <a href="/blog/">Blog</a> · <a href="/blog/feed.xml">RSS</a> · <a href="/llms.txt">llms.txt</a> · Building data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL). No cookies; anonymous visit counts only.</p></footer>
+<script src="/t.js" defer></script>
+</body>
+</html>

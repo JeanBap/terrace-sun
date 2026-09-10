@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>London sun hours by orientation and floor</title>
+<meta name="description" content="How many hours of direct sun does a flat in London get? Tables by window orientation, floor and street width for every season, from solar geometry.">
+<link rel="canonical" href="https://terrace-sun.netlify.app/sun-hours/london/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="author" content="Yanni Papoutsi">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Terrace Sun">
+<meta property="og:title" content="London sun hours by orientation and floor">
+<meta property="og:description" content="How many hours of direct sun does a flat in London get? Tables by window orientation, floor and street width for every season, from solar geometry.">
+<meta property="og:url" content="https://terrace-sun.netlify.app/sun-hours/london/">
+<meta property="og:image" content="https://terrace-sun.netlify.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="alternate" type="application/rss+xml" title="Terrace Sun blog" href="/blog/feed.xml">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='26' fill='%23f0a202'/></svg>">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/blog.css">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Article",
+   "headline": "Sun hours for homes in London: orientation, floor and season",
+   "description": "How many hours of direct sun does a flat in London get? Tables by window orientation, floor and street width for every season, from solar geometry.",
+   "url": "https://terrace-sun.netlify.app/sun-hours/london/",
+   "mainEntityOfPage": "https://terrace-sun.netlify.app/sun-hours/london/",
+   "datePublished": "2026-09-10",
+   "dateModified": "2026-09-10",
+   "inLanguage": "en-GB",
+   "author": {
+    "@type": "Person",
+    "name": "Yanni Papoutsi",
+    "jobTitle": "Founder",
+    "address": {
+     "@type": "PostalAddress",
+     "addressLocality": "Rome",
+     "addressCountry": "IT"
+    }
+   },
+   "publisher": {
+    "@type": "Organization",
+    "name": "Terrace Sun",
+    "url": "https://terrace-sun.netlify.app/",
+    "logo": {
+     "@type": "ImageObject",
+     "url": "https://terrace-sun.netlify.app/og.png",
+     "width": 1200,
+     "height": 630
+    }
+   },
+   "image": "https://terrace-sun.netlify.app/og.png",
+   "about": {
+    "@type": "Place",
+    "name": "London, United Kingdom",
+    "geo": {
+     "@type": "GeoCoordinates",
+     "latitude": 51.5072,
+     "longitude": -0.1276
+    }
+   },
+   "isBasedOn": {
+    "@type": "Dataset",
+    "name": "Terrace Sun sun hours by city, orientation and floor",
+    "url": "https://terrace-sun.netlify.app/data/sun-hours-cities.json"
+   }
+  },
+  {
+   "@type": "BreadcrumbList",
+   "itemListElement": [
+    {
+     "@type": "ListItem",
+     "position": 1,
+     "name": "Terrace Sun",
+     "item": "https://terrace-sun.netlify.app/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 2,
+     "name": "Sun hours by city",
+     "item": "https://terrace-sun.netlify.app/sun-hours/"
+    },
+    {
+     "@type": "ListItem",
+     "position": 3,
+     "name": "London",
+     "item": "https://terrace-sun.netlify.app/sun-hours/london/"
+    }
+   ]
+  },
+  {
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "How many hours of sun does a south-facing flat get in London?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "With nothing in front, a south-facing window in London can see the sun for 7.7 hours on 21 December and 9.1 hours on 21 June. On a 12 m street lined with 18 m buildings, the ground floor gets 0 hours on 21 December and the 5th floor 6 hours."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Which floor gets winter sun in London?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "For a south-facing window opposite 18 m buildings, midday sun on 21 December starts at the 5th floor on an 8 m street, the 5th floor on a 12 m street, the 4th floor on a 20 m street and the 3rd floor on a 30 m street."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does a north-facing flat in London get any direct sun?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Only in the warmer half of the year: 7 hours on 21 June with a clear view, early in the morning and in the evening, and none between the September and March equinoxes."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "When is the sun lowest in London?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "On 21 December the sun rises at 08:08 and sets at 15:49 local time, and reaches 15.1° above the horizon at 11:59."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
+</head>
+<body class="blog">
+<header class="top"><div class="wrap titlerow"><a class="brandlink" href="/"><span class="sun" aria-hidden="true"></span>Terrace Sun</a>
+<nav class="topnav" aria-label="Main"><a href="/">Check a spot</a><a href="/listings/" data-track="nav_listings">For estate agents</a><a href="/sun-hours/">Sun hours by city</a><a href="/blog/">Blog</a><a href="/rome-sunny-cafes/">Rome cafés</a></nav></div></header>
+<main class="wrap post"><nav class="crumbs small muted" aria-label="Breadcrumb"><a href="/">Terrace Sun</a> › <a href="/sun-hours/">Sun hours by city</a> › <span>London</span></nav><article><h1 id="sun-hours-for-homes-in-london-orientation-floor-and-season">Sun hours for homes in London: orientation, floor and season</h1>
+<div class="tldr">
+<p><strong>In short.</strong> In London (51.5° N) the sun climbs to <strong>15.1°</strong> at noon on 21 December and <strong>61.9°</strong> on 21 June. A south-facing window with a clear view can see the sun for <strong>7.7 hours</strong> on the shortest day; a north-facing window gets <strong>none</strong> from the September to the March equinox and <strong>7 hours</strong> on 21 June. On a 12 m street lined with 18 m buildings, a south-facing flat gets midday sun in December only from the <strong>5th floor</strong> up.</p>
+</div>
+<h2 id="sun-basics-in-london">Sun basics in London</h2>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>20 March</th>
+<th>21 June</th>
+<th>22 September</th>
+<th>21 December</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daylight (hours)</td>
+<td>12.1</td>
+<td>16.5</td>
+<td>12.2</td>
+<td>7.7</td>
+</tr>
+<tr>
+<td>Sunrise / sunset</td>
+<td>06:08 / 18:10</td>
+<td>04:48 / 21:17</td>
+<td>06:49 / 18:57</td>
+<td>08:08 / 15:49</td>
+</tr>
+<tr>
+<td>Solar noon</td>
+<td>12:09</td>
+<td>13:03</td>
+<td>12:53</td>
+<td>11:59</td>
+</tr>
+<tr>
+<td>Sun height at noon</td>
+<td>38.3°</td>
+<td>61.9°</td>
+<td>38.9°</td>
+<td>15.1°</td>
+</tr>
+<tr>
+<td>Sunrise / sunset direction</td>
+<td>90° / 270°</td>
+<td>50° / 310°</td>
+<td>89° / 271°</td>
+<td>129° / 231°</td>
+</tr>
+</tbody>
+</table></div>
+<p>Local time (Europe/London). Directions clockwise from north: 90° east, 180° south, 270° west.</p>
+<h2 id="hours-of-sun-by-window-orientation">Hours of sun by window orientation</h2>
+<p>Hours when the sun is above the horizon and in front of the window, with no obstructions: the most a window facing that way can receive.</p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Window faces</th>
+<th>20 March</th>
+<th>21 June</th>
+<th>22 September</th>
+<th>21 December</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>North</td>
+<td>0 h</td>
+<td>7 h</td>
+<td>0 h</td>
+<td>0 h</td>
+</tr>
+<tr>
+<td>North-east</td>
+<td>3.4 h</td>
+<td>6.5 h</td>
+<td>3.5 h</td>
+<td>0.4 h</td>
+</tr>
+<tr>
+<td>East</td>
+<td>5.9 h</td>
+<td>8.2 h</td>
+<td>6 h</td>
+<td>3.8 h</td>
+</tr>
+<tr>
+<td>South-east</td>
+<td>8.5 h</td>
+<td>9.9 h</td>
+<td>8.5 h</td>
+<td>7.1 h</td>
+</tr>
+<tr>
+<td>South</td>
+<td>11.8 h</td>
+<td>9.1 h</td>
+<td>11.8 h</td>
+<td>7.7 h</td>
+</tr>
+<tr>
+<td>South-west</td>
+<td>8.5 h</td>
+<td>9.9 h</td>
+<td>8.5 h</td>
+<td>7.1 h</td>
+</tr>
+<tr>
+<td>West</td>
+<td>6 h</td>
+<td>8.2 h</td>
+<td>6 h</td>
+<td>3.8 h</td>
+</tr>
+<tr>
+<td>North-west</td>
+<td>3.4 h</td>
+<td>6.5 h</td>
+<td>3.5 h</td>
+<td>0.4 h</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="hours-of-sun-by-floor-on-a-typical-street-21-december">Hours of sun by floor on a typical street, 21 December</h2>
+<p>A long straight street lined with continuous 18 m buildings (five to six storeys), window 1.5 m above each floor.</p>
+<p><strong>South-facing façade</strong></p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Floor</th>
+<th>8 m street</th>
+<th>12 m street</th>
+<th>20 m street</th>
+<th>30 m street</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ground</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>0 h</td>
+</tr>
+<tr>
+<td>1st</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>0 h</td>
+</tr>
+<tr>
+<td>2nd</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>0 h</td>
+</tr>
+<tr>
+<td>3rd</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>2.3 h</td>
+</tr>
+<tr>
+<td>4th</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>3.5 h</td>
+<td>5.5 h</td>
+</tr>
+<tr>
+<td>5th</td>
+<td>4.6 h</td>
+<td>6 h</td>
+<td>6.7 h</td>
+<td>7.2 h</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>East- or west-facing façade</strong></p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Floor</th>
+<th>8 m street</th>
+<th>12 m street</th>
+<th>20 m street</th>
+<th>30 m street</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ground</td>
+<td>0.4 h</td>
+<td>0.7 h</td>
+<td>1.1 h</td>
+<td>1.5 h</td>
+</tr>
+<tr>
+<td>1st</td>
+<td>0.5 h</td>
+<td>0.8 h</td>
+<td>1.2 h</td>
+<td>1.7 h</td>
+</tr>
+<tr>
+<td>2nd</td>
+<td>0.7 h</td>
+<td>1 h</td>
+<td>1.6 h</td>
+<td>2.1 h</td>
+</tr>
+<tr>
+<td>3rd</td>
+<td>0.9 h</td>
+<td>1.3 h</td>
+<td>2 h</td>
+<td>2.4 h</td>
+</tr>
+<tr>
+<td>4th</td>
+<td>1.5 h</td>
+<td>1.9 h</td>
+<td>2.5 h</td>
+<td>2.8 h</td>
+</tr>
+<tr>
+<td>5th</td>
+<td>2.7 h</td>
+<td>3 h</td>
+<td>3.3 h</td>
+<td>3.4 h</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Lowest floor with midday sun on 21 December (south-facing)</strong></p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>City</th>
+<th>8 m street</th>
+<th>12 m street</th>
+<th>20 m street</th>
+<th>30 m street</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="/sun-hours/london/">London</a></td>
+<td>5th</td>
+<td>5th</td>
+<td>4th</td>
+<td>3rd</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="hours-of-sun-by-floor-on-the-equinox-20-march">Hours of sun by floor on the equinox, 20 March</h2>
+<p><strong>South-facing façade</strong></p>
+<div class="tablewrap"><table>
+<thead>
+<tr>
+<th>Floor</th>
+<th>8 m street</th>
+<th>12 m street</th>
+<th>20 m street</th>
+<th>30 m street</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ground</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>0.2 h</td>
+<td>11.8 h</td>
+</tr>
+<tr>
+<td>1st</td>
+<td>0 h</td>
+<td>0 h</td>
+<td>11.8 h</td>
+<td>11.8 h</td>
+</tr>
+<tr>
+<td>2nd</td>
+<td>0 h</td>
+<td>0.1 h</td>
+<td>11.8 h</td>
+<td>11.8 h</td>
+</tr>
+<tr>
+<td>3rd</td>
+<td>0 h</td>
+<td>11.8 h</td>
+<td>11.8 h</td>
+<td>11.8 h</td>
+</tr>
+<tr>
+<td>4th</td>
+<td>11.8 h</td>
+<td>11.8 h</td>
+<td>11.8 h</td>
+<td>11.8 h</td>
+</tr>
+<tr>
+<td>5th</td>
+<td>11.8 h</td>
+<td>11.8 h</td>
+<td>11.8 h</td>
+<td>11.8 h</td>
+</tr>
+</tbody>
+</table></div>
+<p>Around the equinoxes the sun's angle across an east-west street stays almost constant all day, so a south-facing window tends to get sun for most of the day or not at all: the jump between floors is real, not a rounding artefact.</p>
+<h2 id="what-this-means-for-homes-in-london">What this means for homes in London</h2>
+<ul>
+<li><strong>For winter sun, south-facing and high beats everything.</strong> A clear south-facing window sees the sun for 7.7 of the 7.7 daylight hours on 21 December; east or west sees 3.8.</li>
+<li><strong>On narrow streets, low floors lose the winter sun.</strong> On a 20 m street the south-facing floors get ground 0 h, 1st 0 h, 2nd 0 h, 3rd 0 h, 4th 3.5 h, 5th 6.7 h on 21 December.</li>
+<li><strong>Summer is generous to every orientation</strong>, including north (7 h with a clear view on 21 June).</li>
+<li>Winter sun is scarce in London: on 21 December the day lasts 7.7 hours and the sun never climbs above 15.1°, so floor and street width decide whether a flat sees any.</li>
+</ul>
+<p>Every building is different: a square, a park or a tall neighbour changes the numbers. <a href="/?lat=51.5072&amp;lon=-0.1276&amp;name=London">Check a specific address in London</a> for the hours on each side of the building, floor by floor, or get a <a href="/listings/">Sun Score report for a listing</a>.</p>
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<h3 id="how-many-hours-of-sun-does-a-south-facing-flat-get-in-london">How many hours of sun does a south-facing flat get in London?</h3>
+<p>With nothing in front, a south-facing window in London can see the sun for 7.7 hours on 21 December and 9.1 hours on 21 June. On a 12 m street lined with 18 m buildings, the ground floor gets 0 hours on 21 December and the 5th floor 6 hours.</p>
+<h3 id="which-floor-gets-winter-sun-in-london">Which floor gets winter sun in London?</h3>
+<p>For a south-facing window opposite 18 m buildings, midday sun on 21 December starts at the 5th floor on an 8 m street, the 5th floor on a 12 m street, the 4th floor on a 20 m street and the 3rd floor on a 30 m street.</p>
+<h3 id="does-a-north-facing-flat-in-london-get-any-direct-sun">Does a north-facing flat in London get any direct sun?</h3>
+<p>Only in the warmer half of the year: 7 hours on 21 June with a clear view, early in the morning and in the evening, and none between the September and March equinoxes.</p>
+<h3 id="when-is-the-sun-lowest-in-london">When is the sun lowest in London?</h3>
+<p>On 21 December the sun rises at 08:08 and sets at 15:49 local time, and reaches 15.1° above the horizon at 11:59.</p>
+<h2 id="method-and-data">Method and data</h2>
+<p>Solar position from the Meeus model used by SunCalc, with refraction, in local time (Europe/London), reference days in 2026. Street tables use the Terrace Sun ray-casting engine against a 2 km row of 18 m buildings. Direct sun on a clear day; trees, terrain and clouds are not included. Full explanation in <a href="/blog/how-much-sun-does-a-home-get/">How much sun does a home get? The complete guide</a>. Download the data for all cities: <a href="/data/sun-hours-by-orientation.csv">by orientation (CSV)</a> · <a href="/data/sun-hours-by-floor-and-street.csv">by floor and street (CSV)</a>.</p>
+<p><strong>Other cities:</strong> <a href="/sun-hours/rome/">Rome</a> · <a href="/sun-hours/milan/">Milan</a> · <a href="/sun-hours/florence/">Florence</a> · <a href="/sun-hours/naples/">Naples</a> · <a href="/sun-hours/madrid/">Madrid</a> · <a href="/sun-hours/barcelona/">Barcelona</a> · <a href="/sun-hours/lisbon/">Lisbon</a> · <a href="/sun-hours/athens/">Athens</a> · <a href="/sun-hours/paris/">Paris</a> · <a href="/sun-hours/amsterdam/">Amsterdam</a> · <a href="/sun-hours/berlin/">Berlin</a></p></article></main><footer class="wrap foot muted"><p>Terrace Sun · <a href="/">Check any spot</a> · <a href="/listings/">For estate agents</a> · <a href="/blog/">Blog</a> · <a href="/blog/feed.xml">RSS</a> · <a href="/llms.txt">llms.txt</a> · Building data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL). No cookies; anonymous visit counts only.</p></footer>
+<script src="/t.js" defer></script>
+</body>
+</html>

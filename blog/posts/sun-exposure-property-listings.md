@@ -30,6 +30,8 @@ keywords: sun exposure real estate, sunlight hours apartment, natural light prop
 
 **Listings have not caught up.** "Luminoso", "sun-drenched", "bright": every listing says it, so the word carries no information. The buyer finds out at the viewing that the block opposite puts the living room in shade from 14:00 in winter. That is a wasted viewing for the buyer and for the agent.
 
+For the geometry behind all this, with tables of sun hours by orientation, floor and street width for 12 European cities, see [How much sun does a home get? The complete guide](/blog/how-much-sun-does-a-home-get/).
+
 ## What "sun exposure" actually means
 
 Five different things get mixed up under "sunny". Only one of them is what buyers feel in the room.
