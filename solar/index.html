@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Terrace Sun: sun hours for any café terrace, apartment or house</title>
-<meta name="description" content="Type a café name, an address or coordinates and see the exact times direct sun reaches its walls, terrace tables and windows on each floor, on any date. Built from OpenStreetMap buildings.">
-<link rel="canonical" href="https://terrace-sun.netlify.app/">
+<title>Roof and balcony solar shading pre-check</title>
+<meta name="description" content="Before a site visit, check how many hours a roof or balcony is unshaded by neighbouring buildings, month by month. Free, from OpenStreetMap.">
+<link rel="canonical" href="https://terrace-sun.netlify.app/solar/">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#c2562b">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Terrace Sun: when does the sun hit a café wall?">
-<meta property="og:description" content="Sun and shade times for any café wall or terrace, on any date, from OpenStreetMap buildings.">
-<meta property="og:url" content="https://terrace-sun.netlify.app/">
+<meta property="og:title" content="Roof and balcony solar shading pre-check">
+<meta property="og:description" content="Before a site visit, check how many hours a roof or balcony is unshaded by neighbouring buildings, month by month. Free, from OpenStreetMap.">
+<meta property="og:url" content="https://terrace-sun.netlify.app/solar/">
 <meta property="og:image" content="https://terrace-sun.netlify.app/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -20,26 +20,19 @@
 <link rel="stylesheet" href="/vendor/leaflet.css">
 <link rel="stylesheet" href="/style.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@graph":[
-{"@type":"WebApplication","name":"Terrace Sun","url":"https://terrace-sun.netlify.app/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Computes when direct sunlight reaches the walls and outdoor tables of a café on a chosen date, using OpenStreetMap building footprints and heights."},
-{"@type":"FAQPage","mainEntity":[
-{"@type":"Question","name":"How does Terrace Sun work out when the sun hits a café?","acceptedAnswer":{"@type":"Answer","text":"It fetches building footprints and heights from OpenStreetMap, finds the café's building and its street-facing walls, then traces a ray towards the sun every five minutes to check whether a taller building blocks it."}},
-{"@type":"Question","name":"Can I use it for an apartment or house listing?","acceptedAnswer":{"@type":"Answer","text":"Yes. Search the address or click the building; the page shows direct sun hours on the windows of every floor for each street-facing wall, with a listing sentence you can copy."}},
-{"@type":"Question","name":"Does it account for trees, awnings or clouds?","acceptedAnswer":{"@type":"Answer","text":"No. It shows direct sun on a clear day with flat ground. Trees, umbrellas, awnings, hills and weather are not included."}},
-{"@type":"Question","name":"How accurate are the times?","acceptedAnswer":{"@type":"Answer","text":"The sun position and shadow maths match the cityshade reference model to within about five minutes. The main error source is missing building heights in OpenStreetMap, which you can adjust on the page."}}
-]}]}
+{"@context": "https://schema.org", "@graph": [{"@type": "WebPage", "name": "Roof and balcony solar shading pre-check", "url": "https://terrace-sun.netlify.app/solar/", "description": "Before a site visit, check how many hours a roof or balcony is unshaded by neighbouring buildings, month by month. Free, from OpenStreetMap.", "isPartOf": {"@type": "WebSite", "name": "Terrace Sun", "url": "https://terrace-sun.netlify.app/"}}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is this a yield estimate?", "acceptedAnswer": {"@type": "Answer", "text": "No. It counts direct-beam hours with a clear sky and flat ground. It tells you whether neighbours shade the roof and when, which is the part a desk check usually gets wrong."}}, {"@type": "Question", "name": "Roof pitch and orientation?", "acceptedAnswer": {"@type": "Answer", "text": "Not modelled: the roof is treated as flat at the building height. Use the wall directions on the page to see which way the building faces."}}]}]}
 </script>
 </head>
-<body>
+<body data-mode="solar">
 <nav class="subnav wrap" aria-label="Uses"><a href="/">Cafés</a><a href="/hotels/">Hotels</a><a href="/hosts/">Holiday rentals</a><a href="/solar/">Solar</a><a href="/weddings/">Weddings</a><a href="/cities/">Cities</a><a href="/rome-sunny-cafes/">Sunny cafés in Rome</a></nav>
 <header class="top">
   <div class="wrap">
-    <h1><span class="sun" aria-hidden="true"></span>Terrace Sun</h1>
-    <p class="lede">When does direct sun reach a café terrace, or the windows of a flat on the 3rd floor? Type a café name, an address, coordinates or a Google Maps link.</p>
+    <h1><span class="sun" aria-hidden="true"></span>Terrace Sun for solar installers</h1>
+    <p class="lede">Rank leads before you drive out. Type the address: you get roof shading by month and balcony shading per wall and floor.</p>
     <form id="form" class="search" autocomplete="off">
       <div class="field grow">
         <label for="q">Café name or coordinates</label>
-        <input id="q" name="q" type="text" placeholder="Bar Fratelli Capone, Rome  or  41.8757, 12.4757" required>
+        <input id="q" name="q" type="text" placeholder="Address of the roof" required>
       </div>
       <div class="field">
         <label for="date">Date</label>
@@ -67,13 +60,13 @@
     <div class="empty" id="empty">
       <h2>How it works</h2>
       <ol>
-        <li>Find the café on OpenStreetMap.</li>
-        <li>Load every building within 250 m, with its height.</li>
-        <li>Pick out the café's street-facing walls.</li>
-        <li>Every 5 minutes from sunrise to sunset, check whether a building blocks the line to the sun.</li>
+        <li>Search the address and click the roof.</li>
+        <li>Read &quot;Roof and balcony solar check&quot;: unshaded share of daylight by month.</li>
+        <li>For balcony PV, pick the floor and read the wall that gets the most sun.</li>
+        <li>Move on to PVGIS or your yield tool for kWh: this is a shading and orientation check only.</li>
       </ol>
       <p>You get: the exact sun times per wall and per terrace, whether it is sunny <em>right now</em>, a shadow map you can play through the day, monthly totals, and a ranking of the sunniest cafés within 220 m.</p>
-      <p class="muted">Try: <a href="?lat=41.8799368&lon=12.4768852&name=Bar%20Fratelli%20Capone%2C%20Piazza%20Testaccio">Bar Fratelli Capone, Rome</a> · <a href="?lat=41.87726&lon=12.47359&name=L%27angolo%20del%20caff%C3%A8%2C%20Testaccio">L'angolo del caffè, Rome</a> · <a href="?q=Caf%C3%A9%20de%20Flore%2C%20Paris">Café de Flore, Paris</a></p>
+      <p class="muted">Or use the <a href="/">general café and terrace tool</a>.</p>
     </div>
     <div id="out" hidden></div>
   </section>
@@ -81,6 +74,8 @@
 
 <section class="wrap faq">
   <h2>Questions</h2>
+  <details><summary>Is this a yield estimate?</summary><p>No. It counts direct-beam hours with a clear sky and flat ground. It tells you whether neighbours shade the roof and when, which is the part a desk check usually gets wrong.</p></details>
+  <details><summary>Roof pitch and orientation?</summary><p>Not modelled: the roof is treated as flat at the building height. Use the wall directions on the page to see which way the building faces.</p></details>
   <details><summary>How does Terrace Sun work out when the sun hits a café?</summary><p>It fetches building footprints and heights from OpenStreetMap, finds the café's building and its street-facing walls, then traces a ray towards the sun every five minutes to check whether a taller building blocks it.</p></details>
   <details><summary>What is the difference between "wall" and "tables"?</summary><p>"Wall" is the café's façade at 1.5 m above the pavement, lit only when the sun is in front of it. "Tables" is a point 2.5 m out from the wall at table height, which can also get sun from the side.</p></details>
   <details><summary>Can I use it for an apartment or house listing?</summary><p>Yes. Search the address or click the building. The "Apartment or house" card shows sun hours on the windows of every floor, from ground floor to the top, for each street-facing wall. Pick the floor of the flat, choose a date (21 December is the honest worst case), and use "Copy listing text" for a sentence you can paste into the listing.</p></details>

@@ -7,7 +7,7 @@ a{color:var(--accent)}
 .wrap{max-width:1280px;margin:0 auto;padding-inline:16px}
 .top{padding-block:20px 8px}
 h1{margin:0;font-size:1.8rem;display:flex;align-items:center;gap:.5rem;letter-spacing:-.01em}
-.sun{width:1.1em;height:1.1em;border-radius:50%;background:var(--sun);box-shadow:0 0 0 4px var(--sunsoft)}
+.sun{flex:none;width:1.1em;height:1.1em;border-radius:50%;background:var(--sun);box-shadow:0 0 0 4px var(--sunsoft)}
 .lede{margin:.25rem 0 1rem;color:var(--muted);max-width:60ch}
 .search{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
 .field{display:flex;flex-direction:column;gap:4px}
@@ -86,3 +86,10 @@ button.small{min-height:32px;padding:4px 10px;font-size:.85rem}
 .year th{font-size:.8rem;text-align:center;padding:2px 4px;color:var(--muted)}
 select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);min-height:44px}
 #floorTbl td{min-width:90px}
+.subnav{display:flex;gap:4px 14px;flex-wrap:wrap;padding-top:10px;font-size:.9rem}
+.subnav a{color:var(--muted);text-decoration:none;padding:4px 0;border-bottom:2px solid transparent}
+.subnav a:hover,.subnav a[aria-current]{color:var(--ink);border-color:var(--sun)}
+.quarter{margin-top:16px}.quarter h2{margin-top:0}.quarter h3{margin:16px 0 6px;font-size:1rem}
+.rank{width:100%;border-collapse:collapse;font-size:.9rem}.rank th{text-align:left;font-size:.78rem;color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}.rank td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}.rank .hrs{white-space:nowrap}
+@media (max-width:600px){.rank th:nth-child(4),.rank td:nth-child(4){display:none}}
+main.wrap>.answer{margin-top:8px}

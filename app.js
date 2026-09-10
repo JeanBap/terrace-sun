@@ -5,7 +5,8 @@
   const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const DIRS = { N: 'north', NNE: 'north-north-east', NE: 'north-east', ENE: 'east-north-east', E: 'east', ESE: 'east-south-east', SE: 'south-east', SSE: 'south-south-east', S: 'south', SSW: 'south-south-west', SW: 'south-west', WSW: 'west-south-west', W: 'west', WNW: 'west-north-west', NW: 'north-west', NNW: 'north-north-west' };
-  const S = { model: null, lat: null, lon: null, name: '', tz: null, res: null, busy: false, yearToken: 0, nearToken: 0, floorToken: 0, floor: 0 };
+  const MODE = document.body.dataset.mode || 'cafe';
+  const S = { model: null, lat: null, lon: null, name: '', tz: null, res: null, busy: false, yearToken: 0, nearToken: 0, floorToken: 0, roofToken: 0, floor: 0 };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   // ---------- date & time zone ----------
@@ -186,13 +187,13 @@
     const [t0, t1] = dayWindow(y, m, d, S.tz);
     const F = E.findFacades(S.model);
     if (F.target && S.floorOverride && S.floorOverride.id === F.target.id) F.target.h = S.floorOverride.n * E.M_PER_LEVEL;
-    const res = E.analyse(S.model, S.lat, S.lon, t0, t1, { stepMin: STEP, facades: F.facades, point: F.pointInside ? null : [0, 0] });
+    const res = E.analyse(S.model, S.lat, S.lon, t0, t1, { stepMin: STEP, facades: F.facades, point: (F.pointInside && MODE !== 'wedding') ? null : [0, 0] });
     Object.assign(S, { res, F, t0, ymd: [y, m, d] });
     const u = new URL(location.href); u.search = '';
     u.searchParams.set('lat', S.lat.toFixed(6)); u.searchParams.set('lon', S.lon.toFixed(6)); u.searchParams.set('date', $('date').value);
     if (!/^Spot at/.test(S.name)) u.searchParams.set('name', S.name);
     history.replaceState(null, '', u);
-    drawMap(); render(); initSlider(); year(); nearby(); floors();
+    drawMap(); render(); initSlider(); year(); nearby(); floors(); roof(); eventCheck();
   }
 
   // ---------- rendering ----------
@@ -282,6 +283,12 @@
         <div style="overflow-x:auto"><table class="year" id="floorTbl"></table></div>
         <p class="note muted">Hours of direct sun on each wall's windows, at 1.5 m above each floor. Click a row to select that floor.</p></article>`;
     }
+    if (MODE === 'solar' && F.target) {
+      h += `<article class="card" id="roofCard"><h3>Roof and balcony solar check <span class="tag">pre-visit</span></h3><p class="answer" id="roofAnswer">Calculating…</p><table class="year" id="roofTbl"></table><p class="note muted">Direct-beam hours on the roof of this building (${Math.round(F.target.h)} m) on the 21st of each month, and on a balcony at the chosen floor for each wall. Not an irradiance model: use it to rank sites and spot shading from neighbours, then run PVGIS or a proper yield tool for kWh.</p></article>`;
+    }
+    if (MODE === 'wedding') {
+      h += `<article class="card" id="eventCard"><h3>Event time check</h3><div class="settings"><div class="field"><label for="evStart">Starts</label><input id="evStart" type="time" value="${S.evStart || '17:00'}"></div><div class="field"><label for="evEnd">Ends</label><input id="evEnd" type="time" value="${S.evEnd || '19:00'}"></div></div><p class="answer" id="evAnswer"></p><p class="note muted">Guests at the pin, at table height. "Sun from the west" means the sun is behind anyone facing west, so face the ceremony the other way. Golden hour is the last hour before sunset.</p></article>`;
+    }
     h += `<article class="card" id="nearby" hidden><h3>Sunniest places nearby <span class="tag">tables, this date</span></h3><table class="year" id="nearbyTbl"></table><p class="note muted">Every named café, bar and restaurant within 220 m. Click one to check it.</p></article>`;
     h += `<article class="card"><h3>Building heights</h3>
       <p class="note ${cov < 50 ? 'warn' : 'muted'}">${cov}% of nearby building area has a real height in OpenStreetMap. The rest is assumed to be ${model.defaultHeight} m tall${model.taggedSamples >= 3 ? ' (typical of the tagged buildings nearby)' : ''}.${cov < 50 ? ' If the street is lined with 5 or 6 storey blocks, try 18 to 20 m.' : ''}</p>
@@ -324,6 +331,46 @@
       S.listingText = `${S.name}, ${floorName(S.floor || 0)}. Direct sunlight on ${fmtDate(y, m, d)}: ${parts.join('; ')}. Longest sun on the ${DIRS[res.facades[best].faces]} side, ${hrs(sel[best].hours)}. Computed from OpenStreetMap building heights with Terrace Sun (${location.href}).`;
     };
     setTimeout(stepFn, 40);
+  }
+
+  // ---------- solar roof ----------
+  function roof() {
+    const tbl = $('roofTbl'); if (!tbl) return;
+    const token = ++S.roofToken, b = S.F.target, [y] = S.ymd;
+    const cx = (b.bbox[0] + b.bbox[2]) / 2, cy = (b.bbox[1] + b.bbox[3]) / 2;
+    const rows = []; let mon = 0;
+    const stepFn = () => {
+      if (token !== S.roofToken || !$('roofTbl')) return;
+      const [t0, t1] = dayWindow(y, mon + 1, 21, S.tz);
+      const r = E.analyse(S.model, S.lat, S.lon, t0, t1, { stepMin: 10, facades: [], point: [cx, cy], pointZ: b.h + 0.5 });
+      const day = (r.sunset - r.sunrise) / 36e5;
+      rows.push([MONTHS[mon], r.point.sum.hours, day]);
+      mon++;
+      if (mon < 12) return setTimeout(stepFn, 0);
+      const tot = rows.reduce((s, r) => s + r[1], 0), dl = rows.reduce((s, r) => s + r[2], 0);
+      tbl.innerHTML = '<thead><tr><th style="text-align:left">Month</th><th>Roof sun</th><th>Daylight</th><th>Unshaded</th></tr></thead><tbody>' + rows.map(([n, h, d]) => `<tr><td>${n}</td><td class="hrs">${h.toFixed(1)} h</td><td class="hrs muted">${d.toFixed(1)} h</td><td class="b"><div class="fill" style="width:${d ? h / d * 100 : 0}%"></div><span class="small">${d ? Math.round(h / d * 100) : 0}%</span></td></tr>`).join('') + '</tbody>';
+      $('roofAnswer').textContent = `The roof is unshaded for ${Math.round(tot / dl * 100)}% of daylight hours across the year (${(tot / 12).toFixed(1)} h a day on average). ${tot / dl > 0.95 ? 'No meaningful shading from neighbours: a good candidate.' : tot / dl > 0.8 ? 'Some shading from neighbours in low-sun months: check panel placement on the sunny side.' : 'Significant shading: expect reduced winter yield, consider a higher mount or another roof.'}`;
+    };
+    setTimeout(stepFn, 40);
+  }
+
+  // ---------- wedding / event ----------
+  function eventCheck() {
+    const el = $('evAnswer'); if (!el) return;
+    const run = () => {
+      S.evStart = $('evStart').value; S.evEnd = $('evEnd').value;
+      const [h1, m1] = S.evStart.split(':').map(Number), [h2, m2] = S.evEnd.split(':').map(Number);
+      const k1 = Math.round((h1 * 60 + m1) / STEP), k2 = Math.max(k1 + 1, Math.round((h2 * 60 + m2) / STEP));
+      const lit = S.res.point ? S.res.point.lit : (S.res.facades[0] ? S.res.facades[0].pave : null);
+      if (!lit) { el.textContent = 'Click the exact spot where guests will be.'; return; }
+      let sunny = 0, n = 0, dirs = {};
+      for (let k = k1; k < k2 && k < lit.length; k++) { n++; if (lit[k] >= 0.5) { sunny++; const d = DIRS[E.compass(S.res.sun[k].az / RAD)].split('-')[0]; dirs[d] = (dirs[d] || 0) + 1; } }
+      const pct = n ? Math.round(sunny / n * 100) : 0;
+      const mainDir = Object.keys(dirs).sort((a, b) => dirs[b] - dirs[a])[0];
+      const golden = S.res.sunset ? `${fmt(S.res.sunset - 36e5)} to ${fmt(S.res.sunset)}` : 'none';
+      el.textContent = `From ${S.evStart} to ${S.evEnd} this spot is in direct sun ${pct}% of the time${mainDir ? ', coming from the ' + mainDir : ''}. ${pct > 70 ? 'Bright: plan shade, water and sunglasses, and face guests away from the ' + mainDir + '.' : pct > 20 ? 'Mixed sun and shade: dappled light, fine for photos, watch the transition times.' : 'Mostly shade: cool for guests, flat light for photos.'} Sunset ${S.res.sunset ? fmt(S.res.sunset) : 'none'}, golden hour ${golden}.`;
+    };
+    $('evStart').onchange = run; $('evEnd').onchange = run; run();
   }
 
   // ---------- nearby venues ----------
