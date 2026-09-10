@@ -28,7 +28,7 @@ export default async (req) => {
         if (e.s || e.m || e.c) inc(utm, [e.s, e.m, e.c].filter(Boolean).join(' / '));
       } else if (e.kind === 'bot') { row.bot++; inc(bots, e.b); inc(botPaths, `${e.b} → ${e.p}`); }
       else if (e.kind === 'disco') { row.disco++; inc(disco, `${e.b} → ${e.p}`); if (e.b !== 'Browser') inc(bots, e.b); }
-      else if (e.kind === 'api') { row.api++; inc(api, `${e.plan || 'open'} · ${e.st}`); inc(apiHosts, e.h || '(direct)'); }
+      else if (e.kind === 'api') { row.api++; inc(api, `${e.plan || 'open'} · ${e.st}${e.src ? ' · ' + e.src : ''}`); inc(apiHosts, e.h || '(direct)'); }
       else if (e.kind === 'badge') { row.badge++; inc(badges, e.h); }
       else if (e.kind === 'ev') { row.ev++; inc(events, e.x ? `${e.n} · ${e.x}` : e.n); }
     }

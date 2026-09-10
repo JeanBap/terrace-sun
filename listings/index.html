@@ -102,7 +102,7 @@ Authorization: Bearer YOUR_KEY</code></pre></div>
 
   <section id="api">
     <h2>API reference</h2>
-    <p><code>GET /api/v1/sun</code> · JSON · CORS enabled · cached 24 h per location and floor.</p>
+    <p><code>GET /api/v1/sun</code> · JSON · CORS enabled · results cached 30 days per location and floor · <a href="/openapi.json">OpenAPI spec</a></p>
     <div class="two">
       <div><h3>Parameters</h3><table class="rtab small"><tbody>
         <tr><td><code>lat</code>, <code>lon</code></td><td>decimal degrees, required</td></tr>
@@ -113,7 +113,7 @@ Authorization: Bearer YOUR_KEY</code></pre></div>
         <tr><td><code>year</code></td><td>reference year, default current</td></tr>
         <tr><td><code>key</code></td><td>API key, or send <code>Authorization: Bearer</code></td></tr>
       </tbody></table>
-      <h3>Errors</h3><p class="small">400 bad coordinates · 401 missing key · 403 invalid key · 503 building data unavailable: OpenStreetMap's servers did not answer inside our 10 s window, retry after 30 s (results are cached 24 h once computed, so a retry is normally instant). The badge and the report do not depend on this: they compute in the visitor's browser if the API is slow.</p></div>
+      <h3>Errors</h3><p class="small">400 bad coordinates · 401 missing key · 403 invalid key · 503 calculating: a new location's building data is still arriving; the calculation finishes in the background, retry after <code>retry_after_s</code> (usually 20 s). The badge and the report never wait for this: they compute in the visitor's browser if needed.</p></div>
       <div><h3>Response (trimmed)</h3><pre><code>{
   "sun_score": 76, "grade": "A",
   "annual_avg_direct_sun_hours": 8.9,

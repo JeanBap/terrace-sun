@@ -66,7 +66,7 @@
     "width": 1200,
     "height": 630
    },
-   "wordCount": 2522,
+   "wordCount": 2564,
    "keywords": "sun exposure real estate, sunlight hours apartment, natural light property listing, sun exposure report, Sun Score, how sunny is this flat, which floor gets the most sun, esposizione solare casa, sun exposure API",
    "about": [
     {
@@ -220,7 +220,7 @@
 <nav class="crumbs small muted" aria-label="Breadcrumb"><a href="/">Terrace Sun</a> › <a href="/blog/">Blog</a> › <span>Sun exposure in listings</span></nav>
 <article>
 <h1>Sun exposure in property listings: how to measure it, show it and sell it</h1>
-<p class="byline muted">By <strong>Yanni Papoutsi</strong>, Rome · Published <time datetime="2026-09-10">10 September 2026</time> · Updated <time datetime="2026-09-10">10 September 2026</time> · 11 min read</p>
+<p class="byline muted">By <strong>Yanni Papoutsi</strong>, Rome · Published <time datetime="2026-09-10">10 September 2026</time> · Updated <time datetime="2026-09-10">10 September 2026</time> · 12 min read</p>
 <div class="tldr">
 <p><strong>In short.</strong> Buyers ask "is it bright?" before almost anything else, and research has put a price on the answer: in Wellington, New Zealand, each extra hour of average daily direct sun added 2.4% to a home's value. Yet most listings still say "sunny" with no numbers behind it. You can now calculate, for any address and floor, how many hours of direct sun each side of a home gets in every season, from the surrounding buildings, and publish it on the listing as a Sun Score badge and a full report. It takes one line of code, one link or one API call.</p>
 </div>
@@ -490,7 +490,7 @@
 </tr>
 </tbody>
 </table></div>
-<p>Parameters: <code>lat</code>, <code>lon</code> (required), <code>floor</code> (0 = ground), <code>floors</code> (floors in the building), <code>height</code> (assumed height for untagged neighbours), <code>name</code>, <code>year</code>, <code>key</code>. Responses are cached for 24 hours per location and floor. The full specification is in <a href="/openapi.json">openapi.json</a>; plans and keys are on the <a href="/listings/#pricing">pricing page</a>.</p>
+<p>Parameters: <code>lat</code>, <code>lon</code> (required), <code>floor</code> (0 = ground), <code>floors</code> (floors in the building), <code>height</code> (assumed height for untagged neighbours), <code>name</code>, <code>year</code>, <code>key</code>. Results are cached for 30 days per location and floor, so repeat calls answer in well under a second. A first request for a new location can take a few seconds; if the building data is slow to arrive, the API answers <code>503</code> with <code>retry_after_s</code> and finishes the calculation in the background. The full specification is in <a href="/openapi.json">openapi.json</a>; plans and keys are on the <a href="/listings/#pricing">pricing page</a>.</p>
 <h2 id="for-ai-agents-and-assistants">For AI agents and assistants</h2>
 <p>When a user asks an assistant "how much sun does the flat at Piazza Testaccio 30, 5th floor, get?", the answer can come from data instead of a guess:</p>
 <ol>

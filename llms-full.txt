@@ -166,7 +166,7 @@ curl "https://terrace-sun.netlify.app/api/v1/sun?lat=41.8799368&lon=12.4768852&f
 | `report_url` | string | Link to the human-readable report |
 | `data` | object | Data source, buildings used, share of real building heights |
 
-Parameters: `lat`, `lon` (required), `floor` (0 = ground), `floors` (floors in the building), `height` (assumed height for untagged neighbours), `name`, `year`, `key`. Responses are cached for 24 hours per location and floor. The full specification is in [openapi.json](https://terrace-sun.netlify.app/openapi.json); plans and keys are on the [pricing page](https://terrace-sun.netlify.app/listings/#pricing).
+Parameters: `lat`, `lon` (required), `floor` (0 = ground), `floors` (floors in the building), `height` (assumed height for untagged neighbours), `name`, `year`, `key`. Results are cached for 30 days per location and floor, so repeat calls answer in well under a second. A first request for a new location can take a few seconds; if the building data is slow to arrive, the API answers `503` with `retry_after_s` and finishes the calculation in the background. The full specification is in [openapi.json](https://terrace-sun.netlify.app/openapi.json); plans and keys are on the [pricing page](https://terrace-sun.netlify.app/listings/#pricing).
 
 ## For AI agents and assistants
 

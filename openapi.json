@@ -26,7 +26,7 @@
    "get": {
     "operationId": "getSunExposure",
     "summary": "Sun exposure report for a location and floor",
-    "description": "Returns the Sun Score, grade, per-wall hours and exact sun times for 20 March, 21 June, 22 September and 21 December, hours per floor, monthly hours and a link to the human-readable report. Cached 24 h per location and floor. The first request for a new location can take up to 10 seconds; retry after 30 seconds on 503.",
+    "description": "Returns the Sun Score, grade, per-wall hours and exact sun times for 20 March, 21 June, 22 September and 21 December, hours per floor, monthly hours and a link to the human-readable report. Results are cached for 30 days per location and floor. If building data for a new location is slow to arrive, the API returns 503 with retry_after_s and completes the calculation in the background; retry after that many seconds.",
     "parameters": [
      {
       "name": "lat",
@@ -154,7 +154,7 @@
       }
      },
      "503": {
-      "description": "Building data temporarily unavailable; retry after 30 seconds",
+      "description": "Calculation in progress for a new location; retry after retry_after_s seconds (usually 20)",
       "content": {
        "application/json": {
         "schema": {
@@ -443,6 +443,15 @@
      },
      "compute_ms": {
       "type": "integer"
+     },
+     "cache": {
+      "type": "string",
+      "enum": [
+       "hit",
+       "osm-cache",
+       "live"
+      ],
+      "description": "Where the answer came from"
      }
     },
     "required": [
