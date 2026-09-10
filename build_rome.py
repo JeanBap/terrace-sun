@@ -65,7 +65,7 @@ page=f'''<!doctype html>
 <section class="card" id="method"><h2>Method and limits</h2>
 <p>Building footprints and heights come from OpenStreetMap. Where a building has no height tag (about 60% of built area here) it is assumed to be 18 m, typical of a Roman palazzina of five or six floors. For each place, a point on the pavement 2 m out from the entrance is tested for a clear line to the sun every 10 minutes on 20 September, 21 June and 21 December 2026. "Sun in window" is the number of those minutes, as hours, inside the time band.</p>
 <p>Not included: trees (Via Marmorata and Piazza Testaccio have plane trees, so their summer numbers are optimistic), umbrellas and awnings, the Aventine and Monte Testaccio hills, clouds. Positions are the OpenStreetMap pin, which for a large bar may not be the terrace. The ranking is a good guide; the exact minute is not a promise. Data as of September 2026, ODbL.</p>
-<p>Want this for another neighbourhood or city? The engine is open source. <a href="/">Check any spot</a> or write to <a href="mailto:papoutsis89@gmail.com">papoutsis89@gmail.com</a>.</p>
+<p>Want this for another neighbourhood or city? The engine is open source. <a href="/">Check any spot</a>.</p>
 </section>
 </main>
 <footer class="wrap foot muted"><p>Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL). Shadow method after cityshade (MIT). Direct sun only, clear sky, no trees. Written by Yanni Papoutsi, Rome. Updated 10 September 2026.</p></footer>
