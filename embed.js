@@ -10,9 +10,14 @@
   a.innerHTML = '<span style="width:14px;height:14px;border-radius:50%;background:#f0a202;box-shadow:0 0 0 3px #fde6b0"></span><span>Sun Score</span><span data-ts="v" style="color:#6e6255;font-weight:500">checking…</span>';
   s.parentNode.insertBefore(a, s.nextSibling);
   var col = { A: '#2e7d32', B: '#7cb342', C: '#f0a202', D: '#ef6c00', E: '#8d6e63' };
-  fetch(base + '/api/v1/sun?' + q + (d.key ? '&key=' + encodeURIComponent(d.key) : '')).then(function (r) { return r.json(); }).then(function (j) {
-    var v = a.querySelector('[data-ts=v]');
-    if (!j || j.error) { v.textContent = 'see report'; return; }
-    v.innerHTML = '<b style="display:inline-block;min-width:22px;text-align:center;color:#fff;border-radius:6px;padding:1px 6px;background:' + (col[j.grade] || '#888') + '">' + j.grade + '</b> ' + j.sun_score + '/100 · ' + j.annual_avg_direct_sun_hours + ' h/day';
-  }).catch(function () { a.querySelector('[data-ts=v]').textContent = 'see report'; });
+  var url = base + '/api/v1/sun?' + q + (d.key ? '&key=' + encodeURIComponent(d.key) : ''), tries = 0;
+  function load() {
+    tries++;
+    fetch(url).then(function (r) { return r.json(); }).then(function (j) {
+      var v = a.querySelector('[data-ts=v]');
+      if (!j || j.error) { if (tries < 3 && j && j.error === 'upstream') return setTimeout(load, 4000); v.textContent = 'see report'; return; }
+      v.innerHTML = '<b style="display:inline-block;min-width:22px;text-align:center;color:#fff;border-radius:6px;padding:1px 6px;background:' + (col[j.grade] || '#888') + '">' + j.grade + '</b> ' + j.sun_score + '/100 · ' + j.annual_avg_direct_sun_hours + ' h/day';
+    }).catch(function () { if (tries < 3) return setTimeout(load, 4000); a.querySelector('[data-ts=v]').textContent = 'see report'; });
+  }
+  load();
 })();
