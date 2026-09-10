@@ -3,7 +3,7 @@
 const E = require('../../engine.js');
 const tzlookup = require('../../vendor/tz-node.js');
 
-const MIRRORS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
+const MIRRORS = ['https://overpass-api.de/api/interpreter', 'https://lz4.overpass-api.de/api/interpreter', 'https://z.overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
 const RADIUS = 250;
 const H = { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'X-Terrace-Sun': 'v1' };
 const reply = (code, body, extra) => ({ statusCode: code, headers: Object.assign({}, H, extra || {}), body: JSON.stringify(body) });
@@ -11,7 +11,7 @@ const reply = (code, body, extra) => ({ statusCode: code, headers: Object.assign
 async function fetchMirror(url, q, ms) {
   const ac = new AbortController(); const t = setTimeout(() => ac.abort(), ms);
   try {
-    const r = await fetch(url, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'TerraceSun/1.0 (+https://terrace-sun.netlify.app)' }, signal: ac.signal });
+    const r = await fetch(url, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json, */*', 'User-Agent': 'Mozilla/5.0 (compatible; TerraceSun/1.0; +https://terrace-sun.netlify.app/listings/)' }, signal: ac.signal });
     if (!r.ok) throw new Error(url.split('/')[2] + ' HTTP ' + r.status);
     const j = await r.json();
     if (!j.elements) throw new Error(url.split('/')[2] + ' bad reply');
