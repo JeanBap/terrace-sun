@@ -1,0 +1,458 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "Terrace Sun sun exposure API",
+  "version": "1.0.0",
+  "description": "Hours of direct sun on each street-facing wall of a building at a given floor, per season and month, with a 0-100 Sun Score (grades A to E). Computed from OpenStreetMap building footprints and heights within 250 m. Direct-beam sun, clear sky, flat ground; trees and awnings are not modelled.",
+  "contact": {
+   "url": "https://terrace-sun.netlify.app/listings/#signup"
+  },
+  "license": {
+   "name": "Data: OpenStreetMap contributors, ODbL",
+   "url": "https://www.openstreetmap.org/copyright"
+  }
+ },
+ "servers": [
+  {
+   "url": "https://terrace-sun.netlify.app"
+  }
+ ],
+ "externalDocs": {
+  "description": "Guide: sun exposure in property listings",
+  "url": "https://terrace-sun.netlify.app/blog/sun-exposure-property-listings/"
+ },
+ "paths": {
+  "/api/v1/sun": {
+   "get": {
+    "operationId": "getSunExposure",
+    "summary": "Sun exposure report for a location and floor",
+    "description": "Returns the Sun Score, grade, per-wall hours and exact sun times for 20 March, 21 June, 22 September and 21 December, hours per floor, monthly hours and a link to the human-readable report. Cached 24 h per location and floor. The first request for a new location can take up to 10 seconds; retry after 30 seconds on 503.",
+    "parameters": [
+     {
+      "name": "lat",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "number",
+       "minimum": -90,
+       "maximum": 90
+      },
+      "description": "Latitude, decimal degrees"
+     },
+     {
+      "name": "lon",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "number",
+       "minimum": -180,
+       "maximum": 180
+      },
+      "description": "Longitude, decimal degrees"
+     },
+     {
+      "name": "floor",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 0,
+       "maximum": 60,
+       "default": 0
+      },
+      "description": "Floor of the home; 0 is the ground floor"
+     },
+     {
+      "name": "floors",
+      "in": "query",
+      "schema": {
+       "type": "integer",
+       "minimum": 1,
+       "maximum": 60
+      },
+      "description": "Number of floors in the building; overrides the OpenStreetMap height"
+     },
+     {
+      "name": "height",
+      "in": "query",
+      "schema": {
+       "type": "number",
+       "minimum": 2,
+       "maximum": 200
+      },
+      "description": "Assumed height in metres for neighbouring buildings without a height tag"
+     },
+     {
+      "name": "name",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      },
+      "description": "Label echoed into report_url"
+     },
+     {
+      "name": "year",
+      "in": "query",
+      "schema": {
+       "type": "integer"
+      },
+      "description": "Reference year; default current year"
+     },
+     {
+      "name": "key",
+      "in": "query",
+      "schema": {
+       "type": "string"
+      },
+      "description": "API key; alternatively send Authorization: Bearer. The key 'demo' works for testing."
+     }
+    ],
+    "security": [
+     {},
+     {
+      "bearer": []
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Sun exposure report",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SunReport"
+        }
+       }
+      }
+     },
+     "400": {
+      "description": "Missing or invalid coordinates",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "401": {
+      "description": "Missing key (only when keys are enforced)",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "403": {
+      "description": "Invalid key",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "503": {
+      "description": "Building data temporarily unavailable; retry after 30 seconds",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "securitySchemes": {
+   "bearer": {
+    "type": "http",
+    "scheme": "bearer"
+   }
+  },
+  "schemas": {
+   "Error": {
+    "type": "object",
+    "properties": {
+     "error": {
+      "type": "string"
+     },
+     "message": {
+      "type": "string"
+     },
+     "retry_after_s": {
+      "type": "integer"
+     }
+    }
+   },
+   "Times": {
+    "type": "array",
+    "items": {
+     "type": "array",
+     "items": {
+      "type": "string",
+      "pattern": "^\\d{2}:\\d{2}$"
+     },
+     "minItems": 2,
+     "maxItems": 2
+    },
+    "description": "Local time ranges with direct sun, e.g. [[\"07:40\",\"16:40\"]]"
+   },
+   "SunReport": {
+    "type": "object",
+    "properties": {
+     "api": {
+      "type": "string"
+     },
+     "generated_at": {
+      "type": "string",
+      "format": "date-time"
+     },
+     "plan": {
+      "type": "string"
+     },
+     "input": {
+      "type": "object",
+      "properties": {
+       "lat": {
+        "type": "number"
+       },
+       "lon": {
+        "type": "number"
+       },
+       "floor": {
+        "type": "integer"
+       },
+       "floors": {
+        "type": [
+         "integer",
+         "null"
+        ]
+       },
+       "height": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "year": {
+        "type": "integer"
+       },
+       "name": {
+        "type": [
+         "string",
+         "null"
+        ]
+       },
+       "timezone": {
+        "type": "string"
+       }
+      }
+     },
+     "report_url": {
+      "type": "string",
+      "format": "uri"
+     },
+     "sun_score": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Share of daylight with direct sun on the sunniest wall, averaged over four seasons"
+     },
+     "grade": {
+      "type": "string",
+      "enum": [
+       "A",
+       "B",
+       "C",
+       "D",
+       "E"
+      ]
+     },
+     "annual_avg_direct_sun_hours": {
+      "type": "number"
+     },
+     "building": {
+      "type": "object",
+      "properties": {
+       "floors": {
+        "type": "integer"
+       },
+       "height_m": {
+        "type": [
+         "number",
+         "null"
+        ]
+       },
+       "height_from_osm": {
+        "type": [
+         "boolean",
+         "null"
+        ]
+       },
+       "point_mode": {
+        "type": "boolean"
+       }
+      }
+     },
+     "facades": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "index": {
+         "type": "integer"
+        },
+        "faces": {
+         "type": [
+          "string",
+          "null"
+         ],
+         "description": "16-point compass direction the wall faces"
+        },
+        "direction_deg": {
+         "type": [
+          "integer",
+          "null"
+         ]
+        },
+        "street": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "length_m": {
+         "type": [
+          "integer",
+          "null"
+         ]
+        },
+        "character": {
+         "type": "string",
+         "enum": [
+          "sun most of the day",
+          "morning sun",
+          "afternoon and evening sun",
+          "midday sun",
+          "no direct sun"
+         ]
+        }
+       }
+      }
+     },
+     "seasons": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "season": {
+         "type": "string",
+         "enum": [
+          "spring",
+          "summer",
+          "autumn",
+          "winter"
+         ]
+        },
+        "date": {
+         "type": "string",
+         "format": "date"
+        },
+        "daylight_hours": {
+         "type": "number"
+        },
+        "sunrise": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "sunset": {
+         "type": [
+          "string",
+          "null"
+         ]
+        },
+        "best_wall": {
+         "type": "integer"
+        },
+        "walls": {
+         "type": "array",
+         "items": {
+          "type": "object",
+          "properties": {
+           "hours": {
+            "type": "number"
+           },
+           "times": {
+            "$ref": "#/components/schemas/Times"
+           }
+          }
+         }
+        }
+       }
+      }
+     },
+     "monthly_best_wall_hours": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "month": {
+         "type": "string"
+        },
+        "hours": {
+         "type": "number"
+        },
+        "daylight_hours": {
+         "type": "number"
+        }
+       }
+      }
+     },
+     "floors": {
+      "type": "array",
+      "items": {
+       "type": "object",
+       "properties": {
+        "floor": {
+         "type": "integer"
+        },
+        "hours": {
+         "type": "number"
+        },
+        "walls": {
+         "type": "array",
+         "items": {
+          "type": "number"
+         }
+        }
+       }
+      }
+     },
+     "data": {
+      "type": "object"
+     },
+     "method": {
+      "type": "string"
+     },
+     "compute_ms": {
+      "type": "integer"
+     }
+    },
+    "required": [
+     "sun_score",
+     "grade",
+     "facades",
+     "seasons",
+     "report_url"
+    ]
+   }
+  }
+ }
+}

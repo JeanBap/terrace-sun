@@ -1,12 +1,13 @@
 // Terrace Sun API: GET /api/v1/sun?lat=..&lon=..&floor=2&floors=5&name=..&key=..
-// Returns a structured sun-exposure report for a property, computed from OpenStreetMap buildings.
-const E = require('../../engine.js');
-const tzlookup = require('../../vendor/tz-node.js');
+// Structured sun-exposure report for a property, computed from OpenStreetMap buildings.
+import E from '../../engine.js';
+import tzlookup from '../../vendor/tz-node.js';
+import { record } from '../../lib/analytics.mjs';
 
 const MIRRORS = ['https://overpass-api.de/api/interpreter', 'https://lz4.overpass-api.de/api/interpreter', 'https://z.overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
 const RADIUS = 250;
-const H = { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'X-Terrace-Sun': 'v1' };
-const reply = (code, body, extra) => ({ statusCode: code, headers: Object.assign({}, H, extra || {}), body: JSON.stringify(body) });
+const BASE_HEADERS = { 'Content-Type': 'application/json; charset=utf-8', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'X-Terrace-Sun': 'v1' };
+const reply = (code, body, extra) => new Response(JSON.stringify(body), { status: code, headers: Object.assign({}, BASE_HEADERS, extra || {}) });
 
 async function fetchMirror(url, q, ms) {
   const ac = new AbortController(); const t = setTimeout(() => ac.abort(), ms);
@@ -34,21 +35,24 @@ async function overpass(lat, lon) {
   return ways;
 }
 
-exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: H, body: '' };
-  const p = event.queryStringParameters || {};
-  const keys = (process.env.TS_API_KEYS || '').split(',').map(s => s.trim()).filter(Boolean);
-  const auth = (event.headers && (event.headers.authorization || event.headers.Authorization) || '').replace(/^Bearer\s+/i, '');
+export default async (req, context) => {
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: BASE_HEADERS });
+  const url = new URL(req.url), p = Object.fromEntries(url.searchParams);
+  let callerHost = '';
+  try { callerHost = new URL(req.headers.get('origin') || req.headers.get('referer') || '').hostname; } catch (e) { }
+  const log = (st, plan) => record('api', { st, plan, h: callerHost, g: context.geo?.country?.code || '' }, 800);
+  const keys = (Netlify.env.get('TS_API_KEYS') || '').split(',').map(s => s.trim()).filter(Boolean);
+  const auth = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
   const key = p.key || auth;
   let plan = 'open';
   if (keys.length) {
-    if (!key) return reply(401, { error: 'missing_key', message: 'Pass ?key=YOUR_KEY or an Authorization: Bearer header. Get a key at https://terrace-sun.netlify.app/listings/' });
+    if (!key) { await log(401, 'none'); return reply(401, { error: 'missing_key', message: 'Pass ?key=YOUR_KEY or an Authorization: Bearer header. Get a key at https://terrace-sun.netlify.app/listings/' }); }
     if (key === 'demo') plan = 'demo';
-    else if (!keys.includes(key)) return reply(403, { error: 'invalid_key', message: 'This key is not active.' });
+    else if (!keys.includes(key)) { await log(403, 'invalid'); return reply(403, { error: 'invalid_key', message: 'This key is not active.' }); }
     else plan = 'paid';
-  }
+  } else if (key === 'demo') plan = 'demo';
   const lat = parseFloat(p.lat), lon = parseFloat(p.lon);
-  if (!(Math.abs(lat) <= 90) || !(Math.abs(lon) <= 180)) return reply(400, { error: 'bad_coordinates', message: 'lat and lon are required, decimal degrees.' });
+  if (!(Math.abs(lat) <= 90) || !(Math.abs(lon) <= 180)) { await log(400, plan); return reply(400, { error: 'bad_coordinates', message: 'lat and lon are required, decimal degrees.' }); }
   const floor = Math.min(60, Math.max(0, parseInt(p.floor || '0', 10) || 0));
   const floors = p.floors ? Math.min(60, Math.max(1, parseInt(p.floors, 10) || 1)) : null;
   const height = p.height ? Math.min(200, Math.max(2, parseFloat(p.height))) : null;
@@ -72,8 +76,12 @@ exports.handler = async (event) => {
       method: 'Direct-beam sun, clear sky, flat ground, 2.5D shadow casting from OSM building footprints and heights. No trees, awnings or terrain. Wall samples 1.5 m above the chosen floor.',
       compute_ms: Date.now() - t0
     };
+    await log(200, plan);
     return reply(200, out, { 'Cache-Control': 'public, max-age=3600', 'Netlify-CDN-Cache-Control': 'public, max-age=86400, durable' });
   } catch (e) {
+    await log(503, plan);
     return reply(503, { error: 'upstream', message: e.message, retry_after_s: 30 }, { 'Retry-After': '30' });
   }
 };
+
+export const config = { path: '/api/v1/sun' };

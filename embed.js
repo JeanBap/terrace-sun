@@ -12,6 +12,7 @@
   a.style.cssText = 'display:inline-flex;align-items:center;gap:8px;font:600 14px/1.2 system-ui,sans-serif;color:#1f1a15;text-decoration:none;border:1px solid #e8dfd2;border-radius:10px;padding:8px 12px;background:#fff';
   a.innerHTML = '<span style="width:14px;height:14px;border-radius:50%;background:#f0a202;box-shadow:0 0 0 3px #fde6b0"></span><span>Sun Score</span><span data-ts="v" style="color:#6e6255;font-weight:500">checking…</span>';
   s.parentNode.insertBefore(a, s.nextSibling);
+  try { if (navigator.sendBeacon) navigator.sendBeacon(base + '/api/t', new Blob([JSON.stringify({ k: 'badge', h: location.hostname, p: location.pathname, x: d.agency || '' })], { type: 'text/plain' })); } catch (e) { }
   var col = { A: '#2e7d32', B: '#7cb342', C: '#f0a202', D: '#ef6c00', E: '#8d6e63' }, v = a.querySelector('[data-ts=v]');
   function show(r) { v.innerHTML = '<b style="display:inline-block;min-width:22px;text-align:center;color:#fff;border-radius:6px;padding:1px 6px;background:' + (col[r.grade] || '#888') + '">' + r.grade + '</b> ' + r.score + '/100 · ' + r.hours + ' h/day'; }
   function fail() { v.textContent = 'see report'; }

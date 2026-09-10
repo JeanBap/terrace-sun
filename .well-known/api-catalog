@@ -1,0 +1,23 @@
+{
+ "linkset": [
+  {
+   "anchor": "https://terrace-sun.netlify.app/api/v1/sun",
+   "service-desc": [
+    {
+     "href": "https://terrace-sun.netlify.app/openapi.json",
+     "type": "application/vnd.oai.openapi+json"
+    }
+   ],
+   "service-doc": [
+    {
+     "href": "https://terrace-sun.netlify.app/blog/sun-exposure-property-listings/",
+     "type": "text/html"
+    },
+    {
+     "href": "https://terrace-sun.netlify.app/listings/#api",
+     "type": "text/html"
+    }
+   ]
+  }
+ ]
+}

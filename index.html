@@ -19,6 +19,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='26' fill='%23f0a202'/><g stroke='%23f0a202' stroke-width='8' stroke-linecap='round'><path d='M50 6v10M50 84v10M6 50h10M84 50h10M19 19l7 7M74 74l7 7M19 81l7-7M74 26l7-7'/></g></svg>">
 <link rel="stylesheet" href="/vendor/leaflet.css">
 <link rel="stylesheet" href="/style.css">
+<script src="/t.js" defer></script>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
 {"@type":"WebApplication","name":"Terrace Sun","url":"https://terrace-sun.netlify.app/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Computes when direct sunlight reaches the walls and outdoor tables of a café on a chosen date, using OpenStreetMap building footprints and heights."},
@@ -33,7 +34,7 @@
 <body>
 <header class="top">
   <div class="wrap">
-    <div class="titlerow"><h1><span class="sun" aria-hidden="true"></span>Terrace Sun</h1><span class="toplinks"><a class="toplink" href="/listings/">For estate agents</a><a class="toplink" href="/rome-sunny-cafes/">Sunniest cafés in Rome</a></span></div>
+    <div class="titlerow"><h1><span class="sun" aria-hidden="true"></span>Terrace Sun</h1><span class="toplinks"><a class="toplink" href="/listings/" data-track="home_listings">For estate agents</a><a class="toplink" href="/blog/">Blog</a><a class="toplink" href="/rome-sunny-cafes/">Sunniest cafés in Rome</a></span></div>
     <p class="lede" id="lede">When does direct sun reach this spot? Type a name, an address, coordinates or a Google Maps link.</p>
     <form id="form" class="search" autocomplete="off">
       <div class="field">
@@ -91,7 +92,7 @@
 </section>
 
 <footer class="wrap foot muted">
-  <p>Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL). Search by <a href="https://nominatim.org/" rel="noopener">Nominatim</a>, buildings by <a href="https://overpass-api.de/" rel="noopener">Overpass API</a>. Shadow method after cityshade (MIT). Direct sun only, clear sky, no trees.</p>
+  <p><a href="/blog/">Blog</a> · <a href="/listings/">For estate agents</a> · Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL). No cookies; anonymous visit counts only. Search by <a href="https://nominatim.org/" rel="noopener">Nominatim</a>, buildings by <a href="https://overpass-api.de/" rel="noopener">Overpass API</a>. Shadow method after cityshade (MIT). Direct sun only, clear sky, no trees.</p>
 </footer>
 
 <script src="/vendor/leaflet.js"></script>

@@ -7,6 +7,10 @@ Type a café name, address, coordinates or Google Maps link. The site loads buil
 Static site, no server, no API keys. Deployed on Netlify.
 
 ## Files
+- `blog/posts/*.md` → `build_blog.py` builds the blog HTML, Markdown copies, RSS, OG images, sitemap, llms.txt, llms-full.txt and robots.txt
+- `netlify/functions/disco.mjs`: serves robots.txt, sitemap, llms files, OpenAPI and RSS, and records which crawlers fetch them (`scripts/netlify-build.mjs` bundles the files at build time)
+- `t.js` + `netlify/functions/t.mjs`: cookieless first-party analytics on Netlify Blobs; `/stats/` dashboard reads `/api/stats` (env `STATS_KEY`)
+- `openapi.json`, `.well-known/api-catalog`: API discovery for developers and AI agents
 - `listings/`: product page for estate agents (Sun Score badge, report, pricing, API docs, key request form via Netlify Forms)
 - `report/` + `report.js`: the branded sun-exposure report document (`?lat&lon&floor&floors&name&agency&logo&agent`)
 - `embed.js`: one-line badge for listing pages

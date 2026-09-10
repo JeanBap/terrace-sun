@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terrace Sun stats</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='26' fill='%23f0a202'/></svg>">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/stats.css">
+</head>
+<body>
+<main class="wrap stats">
+  <div class="titlerow"><h1><span class="sun" aria-hidden="true"></span>Terrace Sun stats</h1><span class="small muted" id="gen"></span></div>
+  <form id="auth" class="filters" autocomplete="off">
+    <div class="field"><label for="key">Stats key</label><input id="key" type="password" required></div>
+    <div class="field"><label for="days">Period</label><select id="days"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select></div>
+    <button type="submit">Show</button>
+  </form>
+  <p id="msg" class="status" role="status"></p>
+  <div id="out" hidden>
+    <section class="tiles" id="tiles" aria-label="Totals"></section>
+    <section class="card chartcard"><h2>Pageviews per day</h2><div class="chart" id="c-pv"></div><details><summary class="small">Show as table</summary><div id="t-pv"></div></details></section>
+    <section class="card chartcard"><h2>Crawler and AI agent fetches per day</h2><p class="small muted">Bots that ran the page, plus every fetch of robots.txt, sitemap.xml, llms.txt, llms-full.txt, openapi.json and the RSS feed.</p><div class="chart" id="c-bot"></div></section>
+    <div class="grid" id="lists"></div>
+    <section class="card"><h2>Search Console and Bing</h2><p class="small">Search queries, impressions and rankings come from <a href="https://search.google.com/search-console" rel="noopener">Google Search Console</a> and <a href="https://www.bing.com/webmasters" rel="noopener">Bing Webmaster Tools</a> (Bing also feeds ChatGPT search and Copilot). Form submissions are in the Netlify dashboard under Forms.</p></section>
+  </div>
+  <div class="tip" id="tip" hidden></div>
+</main>
+<script src="/stats.js"></script>
+</body>
+</html>

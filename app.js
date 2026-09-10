@@ -209,6 +209,7 @@
     if (!/^Spot at/.test(S.name)) u.searchParams.set('name', S.name);
     history.replaceState(null, '', u);
     drawMap(); render(); initSlider(); year(); nearby(); floors(); roof(); eventCheck();
+    if (window.tsTrack) window.tsTrack('check', MODE);
   }
 
   // ---------- rendering ----------

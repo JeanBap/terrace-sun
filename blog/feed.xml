@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>Terrace Sun blog</title>
+<link>https://terrace-sun.netlify.app/blog/</link>
+<atom:link href="https://terrace-sun.netlify.app/blog/feed.xml" rel="self" type="application/rss+xml"/>
+<description>Sun exposure and natural light data for property, cafés and cities.</description>
+<language>en-gb</language>
+<item><title>Sun exposure in property listings: how to measure it, show it and sell it</title><link>https://terrace-sun.netlify.app/blog/sun-exposure-property-listings/</link><guid isPermaLink="true">https://terrace-sun.netlify.app/blog/sun-exposure-property-listings/</guid><pubDate>Thu, 10 Sep 2026 08:00:00 +0000</pubDate><description>How many hours of direct sun does a flat get, on which side, at which floor, in winter? Measure it for any address and show it on listings with a Sun Score.</description></item>
+</channel>
+</rss>

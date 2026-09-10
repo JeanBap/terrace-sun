@@ -10,7 +10,7 @@
   const name = P.get('name') || 'Property', agency = P.get('agency'), logo = P.get('logo'), agent = P.get('agent'), year = new Date().getFullYear();
   const floorName = f => f === 0 ? 'Ground floor' : f === 1 ? '1st floor' : f === 2 ? '2nd floor' : f === 3 ? '3rd floor' : f + 'th floor';
   const status = (m, err) => { const el = $('status'); el.textContent = m || ''; el.classList.toggle('err', !!err); el.hidden = !m; };
-  $('printBtn').onclick = () => window.print();
+  $('printBtn').onclick = () => { if (window.tsTrack) window.tsTrack('report_print', agency || ''); window.print(); };
   $('genDate').textContent = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
   if (agency) { $('brandName').textContent = agency; document.title = `Sun Exposure Report: ${name} | ${agency}`; }
   if (logo && /^https:\/\//.test(logo)) { const img = document.createElement('img'); img.src = logo; img.alt = agency || 'logo'; img.onerror = () => img.remove(); $('brand').insertBefore(img, $('brandName')); $('brand').querySelector('.sun').remove(); }
@@ -47,6 +47,7 @@
       render(model, rep, tz);
       status('');
       $('doc').hidden = false;
+      if (window.tsTrack) window.tsTrack('report_view', agency || '');
     } catch (e) { status(e.message, true); }
   })();
 

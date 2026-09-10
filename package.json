@@ -1,0 +1,11 @@
+{
+  "name": "terrace-sun",
+  "private": true,
+  "description": "Sun exposure for café terraces, apartments, roofs and events, from OpenStreetMap buildings.",
+  "scripts": {
+    "build": "node scripts/netlify-build.mjs"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.0.3"
+  }
+}

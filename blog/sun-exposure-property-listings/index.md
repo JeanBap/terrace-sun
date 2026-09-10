@@ -1,0 +1,217 @@
+# Sun exposure in property listings: how to measure it, show it and sell it
+
+> How many hours of direct sun does a flat get, on which side, at which floor, in winter? Measure it for any address and show it on listings with a Sun Score.
+
+By Yanni Papoutsi, Rome. Published 2026-09-10, updated 2026-09-10. Canonical: https://terrace-sun.netlify.app/blog/sun-exposure-property-listings/
+
+
+**In short.** Buyers ask "is it bright?" before almost anything else, and research has put a price on the answer: in Wellington, New Zealand, each extra hour of average daily direct sun added 2.4% to a home's value. Yet most listings still say "sunny" with no numbers behind it. You can now calculate, for any address and floor, how many hours of direct sun each side of a home gets in every season, from the surrounding buildings, and publish it on the listing as a Sun Score badge and a full report. It takes one line of code, one link or one API call.
+
+- **2.4%** of market value per extra hour of average daily direct sunlight, from 5,584 house sales in Wellington, 2008 to 2014 ([Fleming et al., 2018](#sources)).
+- **43.7%** of Italians describing their ideal home mention bright rooms ([AstraRicerche for Netrais, via idealista, 2025](#sources)).
+- **1.5 h, 3 h, 4 h**: the minimum, medium and high levels of sunlight exposure in the European daylight standard EN 17037, tested on a clear day between 1 February and 21 March ([EN 17037](#sources)).
+- **9.0 h vs 6.0 h** of direct sun on 21 December for the top floor and the ground floor of the same building on Piazza Testaccio, Rome ([worked example](#worked-example-two-buildings-in-testaccio-rome)).
+
+## Why sun exposure sells homes
+
+**Sunlight has a measurable price.** Economists at Motu Research studied 5,584 house sales in Wellington between 2008 and 2014. They modelled the hours of direct sun each house received across the year from fine-resolution terrain data and found that each additional hour of average daily direct sunlight added 2.4% to the dwelling's market value, after controlling for the usual drivers of price ([Fleming et al., 2018](#sources)).
+
+**Buyers say so too.** When Italians were asked to describe their ideal home, 43.7% named bright rooms ("ambienti luminosi") ([AstraRicerche for Netrais, reported by idealista, July 2025](#sources)). Anyone who has shown flats in Rome, Milan or Lisbon knows the question comes in the first minute of a viewing.
+
+**It is measurable, and Europe has a standard for it.** EN 17037, the European standard for daylight in buildings, grades how much direct sun a room receives on a clear day between 1 February and 21 March: at least 1.5 hours is the minimum level, 3 hours is medium and 4 hours is high ([EN 17037](#sources)).
+
+**Listings have not caught up.** "Luminoso", "sun-drenched", "bright": every listing says it, so the word carries no information. The buyer finds out at the viewing that the block opposite puts the living room in shade from 14:00 in winter. That is a wasted viewing for the buyer and for the agent.
+
+## What "sun exposure" actually means
+
+Five different things get mixed up under "sunny". Only one of them is what buyers feel in the room.
+
+| Term | What it means | Why it matters |
+|---|---|---|
+| Orientation | The compass direction a window faces | Tells you where the sun *could* come from, not whether it arrives |
+| Direct sun hours | Minutes with a clear line from the window to the sun | What buyers feel; blocked by the buildings opposite |
+| Daylight | Diffuse light from the sky, with or without sun | A north-facing room can be bright without direct sun |
+| Floor | How high the window is | Higher floors clear the buildings opposite, above all in winter |
+| Season | The sun's path changes through the year | Winter sun is low and short: 21 December is the honest test |
+
+A useful surprise: **a south-facing wall gets less summer sun than most people expect.** In June the sun rises in the north-east and sets in the north-west, so for part of the morning and evening it is behind a south-facing façade. The worked example below shows this in real numbers.
+
+## Four ways to measure sun exposure
+
+| Method | Neighbouring buildings | Every floor | Every season | Effort | Proof you can share |
+|---|---|---|---|---|---|
+| Orientation from the floor plan | No | No | No | Minutes | No |
+| Visiting at different times | Yes | Only the floors you visit | Only the days you visit | Days to months | Photos |
+| Sun-path apps | Only if you add the buildings | No | Yes | Minutes per window | Screenshots |
+| 3D shadow calculation from building data | Yes | Yes | Yes | Seconds | A report anyone can re-run |
+
+The first three are what agents use today. The fourth is what surveyors and daylight consultants use for planning applications, and it is now cheap enough to run on every listing.
+
+## The Sun Score, explained
+
+The **Sun Score** is a single number from 0 to 100 that answers "how sunny is this home, at this floor, through the year?"
+
+**Definition.** For four reference days (20 March, 21 June, 22 September and 21 December), take the hours of direct sun on the sunniest street-facing wall of the building at the chosen floor, divide by the hours of daylight that day, and average the four ratios. Multiply by 100.
+
+| Grade | Sun Score | What it means for a city home |
+|---|---|---|
+| A | 70 to 100 | Direct sun for most of the day in every season |
+| B | 55 to 69 | A bright home for most of the year |
+| C | 40 to 54 | Good sun for part of the day; check the winter figure |
+| D | 25 to 39 | Limited direct sun; the buildings opposite shade this floor |
+| E | 0 to 24 | Very little direct sun reaches this floor |
+
+**How it is calculated.** Building footprints and heights come from OpenStreetMap for every building within 250 metres. For each street-facing wall, points 1.5 metres above the chosen floor are tested every 10 minutes from sunrise to sunset for a clear line to the sun, using a standard solar position model and 2.5D shadow casting.
+
+**How accurate it is.** The shadow maths was checked against [cityshade](https://github.com/milanjanosov/cityshade), an open reference model, on identical buildings: across 25 test points the median difference was about 5 minutes of sun per day. The main source of error is not the maths but the data: missing building heights in OpenStreetMap, and trees, which are not modelled.
+
+## Worked example: two buildings in Testaccio, Rome
+
+Three homes, calculated in September 2026. The first two are in the same building on Piazza Testaccio, facing south-south-east onto the square. The third faces a narrower street two blocks away.
+
+| Home | Sun Score | 21 December | 21 June |
+|---|---|---|---|
+| Piazza Testaccio, top floor (5th of 6) | **78 (A)** | 9.0 h, 07:40 to 16:40 | 8.8 h |
+| Same building, ground floor | **63 (B)** | 6.0 h, 08:40 to 14:50 | 8.7 h |
+| Via Giovanni Battista Bodoni, 1st floor | **50 (C)** | 2.6 h, 10:20 to 13:00 | 7.4 h |
+
+**Floor by floor, 20 March, same Piazza Testaccio building:** ground 7.8 h, 1st 8.1 h, 2nd 8.4 h, 3rd 8.8 h, 4th 9.3 h, 5th 9.5 h.
+
+What the numbers say:
+
+1. **Floor decides winter.** The top floor gets 3 more hours of December sun than the ground floor of the same building, because the low winter sun clears the buildings across the square.
+2. **Summer is not the peak for a south-facing wall.** Both Piazza Testaccio flats get less direct sun on 21 June than on 20 March: in June the sun spends the evening in the north-west, behind the façade.
+3. **The street matters as much as the orientation.** The Via Bodoni flat also has a south-facing side, but on the 1st floor of a narrow street it gets 2.6 hours of winter sun. EN 17037 would still call that a pass at the minimum level; a buyer comparing it with the Piazza Testaccio top floor would not.
+
+Data note: 37% and 45% of the surrounding built area had real building heights in OpenStreetMap; the rest was assumed to be 15.2 m, the typical height of the tagged buildings nearby. [Open the top-floor report](https://terrace-sun.netlify.app/report/?lat=41.8799368&lon=12.4768852&floor=5&floors=6&name=Piazza%20Testaccio%2C%20top%20floor).
+
+## How to add sun exposure to a listing in one click
+
+You need three things: the coordinates of the building (the portal's map pin, or right-click in Google Maps and copy), the floor of the home (0 is the ground floor) and, ideally, the number of floors in the building.
+
+**Option 1: a badge on the listing page.** Paste one line where the listing is rendered. The badge shows the grade and score and opens the branded report.
+
+```html
+<script async src="https://terrace-sun.netlify.app/embed.js"
+  data-lat="41.8799" data-lon="12.4769" data-floor="5" data-floors="6"
+  data-name="Piazza Testaccio, top floor" data-agency="Your Agency"></script>
+```
+
+**Option 2: a link.** No code at all. Put the report link in the listing text, the brochure or a QR code at the viewing.
+
+```text
+https://terrace-sun.netlify.app/report/?lat=41.8799&lon=12.4769&floor=5&floors=6
+  &name=Piazza+Testaccio&agency=Your+Agency&logo=https://your-agency.example/logo.png
+```
+
+**Option 3: the API.** One request per listing, for portals and CRMs. See the next section.
+
+The report shows the Sun Score, the four seasons with exact sun times, each side of the home, a floor-by-floor comparison, a month-by-month profile, a shadow map, and the method and limits. It carries your agency name, logo and contact, and prints to PDF. [See a sample report](https://terrace-sun.netlify.app/report/?lat=41.8772592&lon=12.4735942&floor=2&floors=5&name=Via%20Alessandro%20Volta%2C%20Testaccio&agency=Demo%20Agency).
+
+## Writing the listing: copy that uses the numbers
+
+Three rules: quote the winter figure, name the side of the home, and link the report so anyone can check.
+
+**English**
+
+> Sun Score A (78/100). The living room faces south-south-east onto Piazza Testaccio: direct sun from 07:40 to 16:40 on 21 December, the shortest day of the year. Calculated from the surrounding buildings; full report linked.
+
+**Italiano**
+
+> Sun Score A (78/100). Il soggiorno è esposto a sud-sud-est su Piazza Testaccio: sole diretto dalle 7:40 alle 16:40 il 21 dicembre, il giorno più corto dell'anno. Calcolo basato sugli edifici circostanti, report completo nel link.
+
+Do not round up, do not quote only the summer figure, and do not call a grade C home "sun-drenched". Buyers will check, and the numbers are the reason they trust the rest of the listing.
+
+## For portals and developers: the API
+
+```bash
+curl "https://terrace-sun.netlify.app/api/v1/sun?lat=41.8799368&lon=12.4768852&floor=5&floors=6" \
+  -H "Authorization: Bearer YOUR_KEY"
+```
+
+| Field | Type | Meaning |
+|---|---|---|
+| `sun_score` | integer 0 to 100 | Share of daylight with direct sun on the sunniest wall, averaged over four seasons |
+| `grade` | A to E | Grade band of the Sun Score |
+| `annual_avg_direct_sun_hours` | number | Average hours of direct sun per day on the sunniest wall |
+| `facades[]` | array | Each street-facing wall: `faces` (compass), `street`, `character`, `length_m` |
+| `seasons[]` | array | Per reference day: `daylight_hours`, `sunrise`, `sunset`, `walls[].hours`, `walls[].times` |
+| `floors[]` | array | Hours on the sunniest wall for every floor, 20 March |
+| `monthly_best_wall_hours[]` | array | Hours on the 21st of each month at the chosen floor |
+| `report_url` | string | Link to the human-readable report |
+| `data` | object | Data source, buildings used, share of real building heights |
+
+Parameters: `lat`, `lon` (required), `floor` (0 = ground), `floors` (floors in the building), `height` (assumed height for untagged neighbours), `name`, `year`, `key`. Responses are cached for 24 hours per location and floor. The full specification is in [openapi.json](https://terrace-sun.netlify.app/openapi.json); plans and keys are on the [pricing page](https://terrace-sun.netlify.app/listings/#pricing).
+
+## For AI agents and assistants
+
+When a user asks an assistant "how much sun does the flat at Piazza Testaccio 30, 5th floor, get?", the answer can come from data instead of a guess:
+
+1. **Geocode the address** to latitude and longitude, for example with OpenStreetMap Nominatim.
+2. **Call** `GET https://terrace-sun.netlify.app/api/v1/sun?lat={lat}&lon={lon}&floor={floor}` (add `floors` if known).
+3. **Answer** with `sun_score` and `grade`, the 21 December and 21 June hours and times from `seasons`, the side of the home from `facades`, and `report_url`. Say that the figures are direct sun on a clear day and exclude trees.
+
+A tool definition you can give an assistant:
+
+```json
+{
+  "name": "get_sun_exposure",
+  "description": "Hours of direct sun on each street-facing wall of a building at a given floor, per season, with a 0-100 Sun Score. Use for questions about how sunny or bright a flat, house or terrace is.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "lat": { "type": "number", "description": "Latitude in decimal degrees" },
+      "lon": { "type": "number", "description": "Longitude in decimal degrees" },
+      "floor": { "type": "integer", "description": "Floor of the home, 0 = ground floor" },
+      "floors": { "type": "integer", "description": "Number of floors in the building, if known" }
+    },
+    "required": ["lat", "lon"]
+  }
+}
+```
+
+Machine-readable entry points: [llms.txt](https://terrace-sun.netlify.app/llms.txt), [llms-full.txt](https://terrace-sun.netlify.app/llms-full.txt), [openapi.json](https://terrace-sun.netlify.app/openapi.json) and a [Markdown version of this article](https://terrace-sun.netlify.app/blog/sun-exposure-property-listings/index.md).
+
+## Limits, and how to stay accurate
+
+- **Direct sun only.** It is not a daylight factor, not the light level inside, and not an energy or solar panel yield calculation.
+- **Clear sky, flat ground.** Weather and hills are not included.
+- **No trees, awnings or balconies above.** In a leafy street, real summer shade will be greater.
+- **Street-facing walls.** Courtyard-facing rooms are not assessed.
+- **Building heights.** Where OpenStreetMap has no height, a typical local height is assumed and the report says so. Set the number of floors of the building to fix it for the home itself.
+- **Say what it is.** Publish it as a calculated estimate from open data, with the method printed on the report and a link anyone can re-run.
+
+## Frequently asked questions
+
+### How many hours of sun should an apartment get?
+
+The European daylight standard EN 17037 treats at least 1.5 hours of direct sun on a clear day between 1 February and 21 March as the minimum, 3 hours as medium and 4 hours as high. For buyers, the winter figure on 21 December is the most telling, because it is the worst case.
+
+### Is a south-facing flat always sunny?
+
+No. Orientation tells you where the sun can come from; the buildings opposite and the floor decide whether it arrives. In the worked example, a 1st-floor flat with a south-facing side on a narrow street gets 2.6 hours of sun on 21 December.
+
+### Which floor gets the most sun?
+
+Usually the highest, because upper floors clear the buildings across the street, and the difference is largest in winter. In the Piazza Testaccio example the top floor gets 9.0 hours on 21 December against 6.0 hours on the ground floor. A taller building next door can change this, which is why it is worth calculating per floor.
+
+### What is a Sun Score?
+
+A number from 0 to 100: the share of daylight hours with direct sun on the sunniest street-facing wall at the home's floor, averaged over 20 March, 21 June, 22 September and 21 December. 70 or more is grade A.
+
+### How do I add a sun exposure report to my listing?
+
+Paste the one-line badge script with the coordinates and floor, or put the report link in the listing. Portals and CRMs can call the JSON API. The free plan includes 5 reports a month.
+
+### Can AI assistants use this data?
+
+Yes. The API returns structured JSON, there is an OpenAPI specification, and the site publishes llms.txt so assistants can find and call it.
+
+## Sources
+
+1. Fleming, D., Grimes, A., Lebreton, L., Maré, D. C. and Nunns, P. (2018). "Valuing sunshine". *Regional Science and Urban Economics*, 68, 268-276. [ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S0166046217302387) · [IDEAS/RePEc](https://ideas.repec.org/a/eee/regeco/v68y2018icp268-276.html)
+2. Motu Economic and Public Policy Research (2017). *Valuing Sunshine: executive summary of Working Paper 17-13*. [PDF](https://www.motu.nz/assets/Documents/our-work/urban-and-regional/housing/Valuing-Sunshine-Executive-Summary.pdf)
+3. CEN (2018). *EN 17037:2018 Daylight in buildings*. [Standard record](https://standards.iteh.ai/catalog/standards/cen/836e5b91-1eb0-4643-a2ba-7ca5a5988e64/en-17037-2018); sunlight exposure levels as summarised in [IES VE documentation](https://help.iesve.com/ve2025/10_4_exposure_to_sunlight_hours.htm).
+4. idealista/news (22 July 2025). "La casa perfetta esiste? Ecco cosa ne pensano gli italiani", survey by AstraRicerche for Netrais. [Article](https://www.idealista.it/news/immobiliare/residenziale/2025/07/22/256191-la-casa-perfetta-esiste-ecco-cosa-ne-pensano-gli-italiani)
+5. cityshade, open-source sun and shade model used as the reference for accuracy checks. [GitHub](https://github.com/milanjanosov/cityshade)
+6. Building data © OpenStreetMap contributors, ODbL. [Copyright](https://www.openstreetmap.org/copyright)

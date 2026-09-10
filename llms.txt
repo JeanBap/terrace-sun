@@ -1,13 +1,21 @@
 # Terrace Sun
 
-> Free web tool that tells you when direct sunlight reaches the walls and outdoor tables of a café (or any spot) on a chosen date.
+> Terrace Sun calculates hours of direct sunlight for any address from OpenStreetMap building footprints and heights: per street-facing wall, per floor, per season. It publishes a 0-100 Sun Score (grades A to E) for property listings, a branded sun-exposure report, a one-line listing badge and a JSON API. It also checks sun on café terraces, roofs and event spots.
 
-- Input: a café name (geocoded with Nominatim), coordinates, or a Google Maps link, plus a date.
-- Method: building footprints and heights from OpenStreetMap (Overpass API) within 250 m; a 2.5D ray is traced towards the sun every 5 minutes for sample points along each street-facing wall (1.5 m high) and 2.5 m in front of it (table height, 1 m).
-- Output: sun time ranges and hours per wall, a shadow map with a time slider, and monthly totals on the 21st of each month.
-- Limits: direct beam only, clear sky, flat ground, no trees or awnings; untagged building heights are estimated and adjustable.
-- One page; the "Checking a" dropdown switches between café terrace, hotel, holiday rental, roof for solar, wedding/event spot and public space (URL param mode=hotel|host|solar|wedding|city). /rome-sunny-cafes/ is a ranked list and map for Testaccio, San Saba, Garbatella.
-- Shareable URL format: https://terrace-sun.netlify.app/?lat=41.87726&lon=12.47359&date=2026-09-10&name=Cafe
-- Real estate mode: for the building at the pin, shows direct sun hours on the windows of each floor (ground to top) per street-facing wall, with a copyable listing sentence.
-- /listings/: Sun Score badge and branded sun-exposure report for property listings; JSON API at GET /api/v1/sun?lat&lon&floor&floors&key. Plans: Free (5 reports/month), Agent EUR 19/month, Agency EUR 79/month, Portal API EUR 390/month.
-- /report/?lat&lon&floor&floors&name&agency&logo&agent: the report document (Sun Score A to E, seasons, facades, floors, monthly, shadow map, method).
+Figures are direct-beam sun on a clear day over flat ground, sampled every 10 minutes (5 in the interactive tool); trees, awnings and terrain are not modelled. Sun Score = share of daylight hours with direct sun on the sunniest street-facing wall at the given floor, averaged over 20 March, 21 June, 22 September and 21 December; A >= 70, B >= 55, C >= 40, D >= 25, E < 25.
+
+## Docs
+- [Sun exposure in property listings: how to measure it, show it and sell it](https://terrace-sun.netlify.app/blog/sun-exposure-property-listings/index.md): method, Sun Score definition, worked example in Rome, listing copy, API fields, tool definition for AI assistants, limits, sources
+- [OpenAPI specification](https://terrace-sun.netlify.app/openapi.json): GET /api/v1/sun?lat&lon&floor&floors&height&name&year&key
+- [Product, pricing and API reference](https://terrace-sun.netlify.app/listings/): Free (5 reports a month), Agent EUR 19/month, Agency EUR 79/month, Portal API EUR 390/month, single report EUR 9
+
+## Tools
+- [Sun exposure API](https://terrace-sun.netlify.app/api/v1/sun?lat=41.8799368&lon=12.4768852&floor=5&floors=6&key=demo): JSON; key "demo" works for testing
+- [Report page](https://terrace-sun.netlify.app/report/?lat=41.8799368&lon=12.4768852&floor=5&floors=6&name=Example): /report/?lat&lon&floor&floors&name&agency&logo&agent
+- [Interactive tool](https://terrace-sun.netlify.app/): café terraces, hotel rooms, holiday rentals, roofs for solar, wedding spots, public spaces (?mode=cafe|hotel|host|solar|wedding|city&lat&lon&date)
+- [Listing badge](https://terrace-sun.netlify.app/embed.js): <script async src="https://terrace-sun.netlify.app/embed.js" data-lat data-lon data-floor data-floors data-name data-agency></script>
+
+## Optional
+- [Sunniest cafés in Testaccio, San Saba and Garbatella, Rome](https://terrace-sun.netlify.app/rome-sunny-cafes/): ranked by morning, midday and afternoon sun
+- [Blog](https://terrace-sun.netlify.app/blog/)
+- [Full text for LLMs](https://terrace-sun.netlify.app/llms-full.txt)

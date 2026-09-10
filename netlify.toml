@@ -1,5 +1,6 @@
 [build]
   publish = "."
+  command = "node scripts/netlify-build.mjs"
 
 [[headers]]
   for = "/*"
@@ -40,7 +41,24 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
-[[redirects]]
-  from = "/api/v1/sun"
-  to = "/.netlify/functions/sun"
-  status = 200
+[[headers]]
+  for = "/*.md"
+  [headers.values]
+    Content-Type = "text/markdown; charset=utf-8"
+    X-Robots-Tag = "noindex"
+
+[[headers]]
+  for = "/blog/posts/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+
+[[headers]]
+  for = "/stats/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/report/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
