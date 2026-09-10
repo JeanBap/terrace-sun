@@ -101,3 +101,4 @@ main.wrap>.answer{margin-top:8px}
 details.card summary{cursor:pointer}
 details.card>*:not(summary){margin-top:10px}
 .tag.warn{color:#9a4b00;border-color:#9a4b00}
+.toplinks{display:flex;gap:14px;flex-wrap:wrap}

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sun Exposure Report</title>
+<meta name="description" content="Structured sun-exposure report for a property: Sun Score, hours of direct sun per façade, floor and season, monthly profile and shadow map. Computed from OpenStreetMap buildings.">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://terrace-sun.netlify.app/report/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='26' fill='%23f0a202'/></svg>">
+<link rel="stylesheet" href="/vendor/leaflet.css">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/report.css">
+</head>
+<body class="report">
+<div class="rwrap">
+  <header class="rhead">
+    <div class="brand" id="brand"><span class="sun" aria-hidden="true"></span><span id="brandName">Terrace Sun</span></div>
+    <div class="rtitle">Sun Exposure Report <span class="muted small" id="genDate"></span></div>
+    <button type="button" class="ghost small noprint" id="printBtn">Print / save PDF</button>
+  </header>
+
+  <p id="status" class="status" role="status" aria-live="polite">Loading buildings from OpenStreetMap…</p>
+
+  <main id="doc" hidden>
+    <section class="hero">
+      <div>
+        <h1 id="propName"></h1>
+        <p class="muted" id="propMeta"></p>
+      </div>
+      <div class="scorebox"><div class="gradeLetter" id="gradeLetter">A</div><div><div class="scoreNum"><span id="scoreNum">0</span><span class="small">/100</span></div><div class="small muted">Sun Score</div></div></div>
+    </section>
+    <p class="answer" id="summary"></p>
+
+    <h2>At a glance</h2>
+    <div class="tiles" id="tiles"></div>
+
+    <h2>Sun on each side of the home</h2>
+    <p class="muted small">Hours of direct sun on the windows of each street-facing wall at this floor, on four reference days. Times are local.</p>
+    <div style="overflow-x:auto"><table class="rtab" id="facTbl"></table></div>
+
+    <div class="two">
+      <section>
+        <h2>Floor by floor</h2>
+        <p class="muted small">Direct sun on the sunniest wall, 20 March. Higher floors clear the buildings opposite.</p>
+        <div id="floorChart"></div>
+      </section>
+      <section>
+        <h2>Through the year</h2>
+        <p class="muted small">Direct sun hours on the sunniest wall, 21st of each month, at this floor.</p>
+        <div id="monthChart"></div>
+      </section>
+    </div>
+
+    <h2>Shadows around the building</h2>
+    <div class="legendrow noprint" id="timeBtns"></div>
+    <div id="map"></div>
+    <p class="muted small" id="mapCap"></p>
+
+    <h2>What this means</h2>
+    <div id="meaning"></div>
+
+    <h2>Method, data and limits</h2>
+    <div class="small muted" id="method"></div>
+    <p class="small muted" id="verify"></p>
+  </main>
+
+  <footer class="rfoot small muted"><span id="powered">Powered by <a href="https://terrace-sun.netlify.app/listings/">Terrace Sun</a></span> · Map data © OpenStreetMap contributors (ODbL)</footer>
+</div>
+<script src="/vendor/leaflet.js"></script>
+<script src="/vendor/tz.js"></script>
+<script src="/engine.js"></script>
+<script src="/report.js"></script>
+</body>
+</html>

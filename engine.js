@@ -68,7 +68,7 @@
       const h = tagHeight(t);
       buildings.push({ id: el.type + '/' + el.id, tags: t, isPart, rings, edges: new Float64Array(edges), inner, bbox: [minx, miny, maxx, maxy], area: Math.abs(area / 2), tagH: h, h, tagged: !isNaN(h) });
     }
-    const LOW = ['garage', 'garages', 'shed', 'kiosk', 'hut', 'toilets', 'service', 'storage_tank', 'greenhouse', 'market', 'industrial', 'warehouse', 'storage', 'retail', 'hangar', 'barn', 'farm_auxiliary', 'container', 'cabin', 'shelter', 'transformer_tower'];
+    const LOW = ['slaughterhouse', 'garage', 'garages', 'shed', 'kiosk', 'hut', 'toilets', 'service', 'storage_tank', 'greenhouse', 'market', 'industrial', 'warehouse', 'storage', 'retail', 'hangar', 'barn', 'farm_auxiliary', 'container', 'cabin', 'shelter', 'transformer_tower'];
     // auto default: area-weighted median of tagged, non low-rise buildings nearby
     const known = buildings.filter(b => b.tagged && !b.isPart && !LOW.includes(b.tags.building) && b.area >= 100).sort((a, b) => a.h - b.h);
     let autoH = 15;
@@ -83,10 +83,13 @@
     return model;
   }
 
-  function applyHeights(model, def) {
-    model.defaultHeight = def;
+  function applyHeights(model, def, userSet) {
+    model.defaultHeight = def; model.userSet = !!userSet;
     for (const b of model.buildings) {
-      let h = b.tagged ? b.tagH : (b.low ? 4 : ['house', 'detached', 'bungalow', 'semidetached_house'].includes(b.tags.building) ? 7 : def);
+      // Untagged: low-rise types 4 m, houses 7 m, everything else the local default; a footprint over 250 m² in
+      // a street grid is almost never a bungalow, so it gets at least 12 m unless the user set the default lower.
+      let h = b.tagged ? b.tagH : (b.low ? 4 : ['house', 'detached', 'bungalow', 'semidetached_house', 'terrace'].includes(b.tags.building) ? 7
+        : (b.area >= 250 && !model.userSet ? Math.max(def, 12) : def));
       b.h = Math.min(Math.max(h, 2), 830);
     }
     return model;
@@ -290,6 +293,59 @@
     return polys;
   }
 
-  const api = { M_PER_LEVEL, sunPosition, parseOSM, applyHeights, findFacades, analyse, shadowShapes, projector, compass, inside, RAD };
+
+  // ---------- time zone helpers (Intl, works in browser and node) ----------
+  function offsetMin(tz, ms) {
+    const p = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).formatToParts(new Date(ms));
+    const g = t => +p.find(x => x.type === t).value;
+    return Math.round((Date.UTC(g('year'), g('month') - 1, g('day'), g('hour') % 24, g('minute'), g('second')) - ms) / 6e4);
+  }
+  function dayWindow(y, m, d, tz) { const base = Date.UTC(y, m - 1, d); const start = base - offsetMin(tz, base + 12 * 36e5) * 6e4; return [start, start + 864e5]; }
+  function hhmm(ms, tz) { return new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(ms)); }
+
+  // ---------- structured property report (shared by the API and the report page) ----------
+  const SEASONS = [['spring', 3, 20], ['summer', 6, 21], ['autumn', 9, 22], ['winter', 12, 21]];
+  const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  function grade(score) { return score >= 70 ? 'A' : score >= 55 ? 'B' : score >= 40 ? 'C' : score >= 25 ? 'D' : 'E'; }
+  function propertyReport(model, lat, lon, tz, opts = {}) {
+    const year = opts.year || new Date().getFullYear(), floor = Math.max(0, opts.floor | 0), step = opts.stepMin || 10;
+    const F = findFacades(model);
+    if (F.target && opts.floors) F.target.h = opts.floors * M_PER_LEVEL;
+    const nF = F.target ? Math.max(1, Math.round(F.target.h / M_PER_LEVEL)) : 1;
+    const fl = Math.min(floor, nF - 1), z = fl * M_PER_LEVEL + 1.5;
+    const usePoint = !F.facades.length;
+    const run = (y, m, d, fz, fac) => {
+      const [t0, t1] = dayWindow(y, m, d, tz);
+      const r = analyse(model, lat, lon, t0, t1, { stepMin: step, facades: fac, wallZ: fz, noPave: true, point: usePoint ? [0, 0] : null, pointZ: fz });
+      const day = r.sunrise ? (r.sunset - r.sunrise) / 36e5 : 0;
+      const walls = usePoint ? [{ hours: r.point.sum.hours, runs: r.point.sum.runs }] : r.facades.map(f => ({ hours: f.wallSum.hours, runs: f.wallSum.runs }));
+      return { day, walls, sunrise: r.sunrise, sunset: r.sunset };
+    };
+    const fmtRuns = runs => runs.map(x => [hhmm(x[0], tz), hhmm(x[1], tz)]);
+    const seasons = SEASONS.map(([name, m, d]) => {
+      const r = run(year, m, d, z, F.facades);
+      const best = r.walls.reduce((bi, w, i, a) => w.hours > a[bi].hours ? i : bi, 0);
+      return { season: name, date: `${year}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`, daylight_hours: +r.day.toFixed(1), sunrise: r.sunrise ? hhmm(r.sunrise, tz) : null, sunset: r.sunset ? hhmm(r.sunset, tz) : null,
+        best_wall: best, walls: r.walls.map(w => ({ hours: +w.hours.toFixed(1), times: fmtRuns(w.runs) })) };
+    });
+    const ratios = seasons.map(s => s.daylight_hours ? s.walls[s.best_wall].hours / s.daylight_hours : 0);
+    const score = Math.round(100 * ratios.reduce((a, b) => a + b, 0) / ratios.length);
+    // combined: share of daylight with sun on ANY wall (union) is what a flat with rooms on two sides gets; approximate by max per season already; add "any wall" union
+    const monthly = MONTHS.map((n, i) => { const r = run(year, i + 1, 21, z, F.facades); const best = Math.max(...r.walls.map(w => w.hours)); return { month: n, hours: +best.toFixed(1), daylight_hours: +r.day.toFixed(1) }; });
+    const floors = [];
+    for (let f = 0; f < nF; f++) { const r = run(year, 3, 20, f * M_PER_LEVEL + 1.5, F.facades); floors.push({ floor: f, hours: +Math.max(...r.walls.map(w => w.hours)).toFixed(1), walls: r.walls.map(w => +w.hours.toFixed(1)) }); }
+    // morning / afternoon character on the equinox
+    const eq = seasons[0];
+    const facades = usePoint ? [{ faces: null, direction_deg: null, street: null, length_m: null }] : F.facades.map(f => ({ faces: f.faces, direction_deg: Math.round(f.faceDeg), street: f.street, length_m: Math.round(f.length) }));
+    const character = facades.map((f, i) => { const t = eq.walls[i].times; if (!t.length) return 'no direct sun'; const first = +t[0][0].slice(0, 2), last = +t[t.length - 1][1].slice(0, 2); return first < 10 && last >= 15 ? 'sun most of the day' : first < 11 ? 'morning sun' : last >= 16 ? 'afternoon and evening sun' : 'midday sun'; });
+    return {
+      score, grade: grade(score), floor: fl, floors_in_building: nF, building_height_m: F.target ? +F.target.h.toFixed(1) : null, building_height_tagged: F.target ? !!F.target.tagged : null, point_mode: usePoint,
+      facades, character, seasons, monthly, floors,
+      annual_avg_hours: +(seasons.reduce((a, s) => a + s.walls[s.best_wall].hours, 0) / seasons.length).toFixed(1),
+      height_coverage: +model.heightCoverage.toFixed(2), default_height_m: model.defaultHeight, buildings_used: model.buildings.length
+    };
+  }
+
+  const api = { M_PER_LEVEL, offsetMin, dayWindow, hhmm, grade, propertyReport, sunPosition, parseOSM, applyHeights, findFacades, analyse, shadowShapes, projector, compass, inside, RAD };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.SunEngine = api;
 })(typeof self !== 'undefined' ? self : this);

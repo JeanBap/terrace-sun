@@ -166,7 +166,7 @@
     try {
       if (!reuse) { S.json = await overpass(lat, lon); S.fetchAt = [lat, lon]; }
       S.model = E.parseOSM(S.json, lat, lon);
-      if (S.userHeight) E.applyHeights(S.model, S.userHeight);
+      if (S.userHeight) E.applyHeights(S.model, S.userHeight, true);
       S.venues = extractVenues(S.json, lat, lon);
       status('');
       await new Promise(r => setTimeout(r, 20));
@@ -318,7 +318,7 @@
     });
     if ($('floor')) { $('nfloors').addEventListener('change', () => { const n = parseInt($('nfloors').value, 10); if (n >= 1) { S.floorOverride = { id: F.target.id, n }; compute(); } });
       $('floor').addEventListener('change', () => { S.floor = +$('floor').value; floors(); }); $('copyListing').addEventListener('click', async () => { try { await navigator.clipboard.writeText(S.listingText || ''); $('copyListing').textContent = 'Copied'; setTimeout(() => $('copyListing').textContent = 'Copy listing text', 1500); } catch (e) { } }); }
-    $('hform').addEventListener('submit', e => { e.preventDefault(); const v = parseFloat($('hdef').value); if (v >= 2) { S.userHeight = v; E.applyHeights(S.model, v); compute(); } });
+    $('hform').addEventListener('submit', e => { e.preventDefault(); const v = parseFloat($('hdef').value); if (v >= 2) { S.userHeight = v; E.applyHeights(S.model, v, true); compute(); } });
   }
 
   // ---------- floors (real estate) ----------

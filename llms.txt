@@ -9,3 +9,5 @@
 - One page; the "Checking a" dropdown switches between café terrace, hotel, holiday rental, roof for solar, wedding/event spot and public space (URL param mode=hotel|host|solar|wedding|city). /rome-sunny-cafes/ is a ranked list and map for Testaccio, San Saba, Garbatella.
 - Shareable URL format: https://terrace-sun.netlify.app/?lat=41.87726&lon=12.47359&date=2026-09-10&name=Cafe
 - Real estate mode: for the building at the pin, shows direct sun hours on the windows of each floor (ground to top) per street-facing wall, with a copyable listing sentence.
+- /listings/: Sun Score badge and branded sun-exposure report for property listings; JSON API at GET /api/v1/sun?lat&lon&floor&floors&key. Plans: Free (5 reports/month), Agent EUR 19/month, Agency EUR 79/month, Portal API EUR 390/month.
+- /report/?lat&lon&floor&floors&name&agency&logo&agent: the report document (Sun Score A to E, seasons, facades, floors, monthly, shadow map, method).
