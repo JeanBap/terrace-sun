@@ -22,12 +22,9 @@ async function fetchMirror(url, q, ms) {
 async function overpass(lat, lon) {
   const a = `(around:${RADIUS},${lat.toFixed(6)},${lon.toFixed(6)})`;
   const q = `[out:json][timeout:8];(way["building"]${a};relation["building"]${a};way["building:part"]${a};way["highway"]["name"](around:90,${lat.toFixed(6)},${lon.toFixed(6)}););out geom;`;
-  const errs = [];
-  for (const pair of [[MIRRORS[0], MIRRORS[1]], [MIRRORS[2], MIRRORS[3]]]) {
-    try { return await Promise.any(pair.map(u => fetchMirror(u, q, 4400))); }
-    catch (e) { (e.errors || [e]).forEach(x => errs.push(x.message)); }
-  }
-  throw new Error('building data unavailable: ' + errs.join('; '));
+  // All mirrors at once, first good answer wins; the budget leaves ~1 s for the shadow maths.
+  try { return await Promise.any(MIRRORS.map(u => fetchMirror(u, q, 8500))); }
+  catch (e) { throw new Error('building data unavailable: ' + (e.errors || [e]).map(x => x.message).join('; ')); }
 }
 
 exports.handler = async (event) => {
