@@ -6,6 +6,6 @@
 - Method: building footprints and heights from OpenStreetMap (Overpass API) within 250 m; a 2.5D ray is traced towards the sun every 5 minutes for sample points along each street-facing wall (1.5 m high) and 2.5 m in front of it (table height, 1 m).
 - Output: sun time ranges and hours per wall, a shadow map with a time slider, and monthly totals on the 21st of each month.
 - Limits: direct beam only, clear sky, flat ground, no trees or awnings; untagged building heights are estimated and adjustable.
-- Pages: /hotels/, /hosts/ (holiday rentals), /solar/ (roof shading pre-check), /weddings/ (event time check), /cities/ (public space shade), /rome-sunny-cafes/ (ranked list for Testaccio, San Saba, Garbatella).
+- One page; the "Checking a" dropdown switches between café terrace, hotel, holiday rental, roof for solar, wedding/event spot and public space (URL param mode=hotel|host|solar|wedding|city). /rome-sunny-cafes/ is a ranked list and map for Testaccio, San Saba, Garbatella.
 - Shareable URL format: https://terrace-sun.netlify.app/?lat=41.87726&lon=12.47359&date=2026-09-10&name=Cafe
 - Real estate mode: for the building at the pin, shows direct sun hours on the windows of each floor (ground to top) per street-facing wall, with a copyable listing sentence.

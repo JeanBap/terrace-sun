@@ -26,6 +26,26 @@ for q in Q:
     sec.append('</section>'); sections.append('\n'.join(sec))
 n=len(V)
 VJSON=json.dumps([{'name':v['name'],'kind':KIND[v['kind']],'street':v['street'],'lat':round(v['lat'],6),'lon':round(v['lon'],6),'morning':v['sep_morning'],'midday':v['sep_midday'],'afternoon':v['sep_afternoon'],'runs':v['sep_runs']} for v in V],ensure_ascii=False).replace('</','<\\/')
+JS='''(function(){
+  var V={VJSON};
+  var COL={morning:'#f0a202',midday:'#c2562b',afternoon:'#6a4c93'},LAB={morning:'morning',midday:'midday',afternoon:'afternoon'},CAP={morning:3,midday:4,afternoon:4.5};
+  var map=L.map('rmap',{scrollWheelZoom:false}).setView([41.871,12.482],14);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+  var layer=L.layerGroup().addTo(map);
+  function best(v){var b='morning',m=-1;['morning','midday','afternoon'].forEach(function(w){var x=v[w]/CAP[w];if(x>m){m=x;b=w;}});return b;}
+  function draw(mode){
+    layer.clearLayers();
+    V.forEach(function(v){
+      var w=mode==='best'?best(v):mode,h=v[w],frac=Math.min(1,h/CAP[w]);
+      var grey=h<1,r=grey?4:4+frac*9;
+      var m=L.circleMarker([v.lat,v.lon],{radius:r,color:'#2b2118',weight:1,fillColor:grey?'#b8b0a6':COL[w],fillOpacity:grey?.6:.9});
+      m.bindPopup('<strong>'+v.name+'</strong><br>'+v.kind+(v.street?' · '+v.street:'')+'<br>Morning '+v.morning+' h · Midday '+v.midday+' h · Afternoon '+v.afternoon+' h<br>Sun: '+(v.runs||'none')+'<br><a href="/?lat='+v.lat+'&lon='+v.lon+'&name='+encodeURIComponent(v.name)+'">Check any date</a>');
+      m.addTo(layer); if(!grey) m.bringToFront();
+    });
+  }
+  draw('best'); map.fitBounds(V.map(function(v){return [v.lat,v.lon];}),{padding:[20,20]});
+  document.querySelectorAll('.lg').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.lg').forEach(function(x){x.classList.remove('on');});b.classList.add('on');draw(b.dataset.w);});});
+})();'''
 page=f'''<!doctype html>
 <html lang="en-GB">
 <head>
@@ -43,9 +63,8 @@ page=f'''<!doctype html>
 </script>
 </head>
 <body>
-<nav class="subnav wrap" aria-label="Uses"><a href="/">Cafés</a><a href="/hotels/">Hotels</a><a href="/hosts/">Holiday rentals</a><a href="/solar/">Solar</a><a href="/weddings/">Weddings</a><a href="/cities/">Cities</a><a href="/rome-sunny-cafes/" aria-current="page">Sunny cafés in Rome</a></nav>
 <header class="top"><div class="wrap">
-<h1><span class="sun" aria-hidden="true"></span>Sunniest cafés in Testaccio, San Saba and Garbatella</h1>
+<div class="titlerow"><h1><span class="sun" aria-hidden="true"></span>Sunniest cafés in Testaccio, San Saba and Garbatella</h1><a class="toplink" href="/">Check any spot</a></div>
 <p class="lede">Where to sit outside in the sun, morning, midday or afternoon. Every café, bar and gelateria on OpenStreetMap in the three quarters ({n} places) was checked against the shadows of the surrounding buildings, every 10 minutes, for a September day. Click a name to see its sun times on any date.</p>
 <p class="muted small">Jump to: <a href="#testaccio">Testaccio</a> · <a href="#san-saba">San Saba</a> · <a href="#garbatella">Garbatella</a> · <a href="#method">method and limits</a></p>
 </div></header>
@@ -70,29 +89,8 @@ page=f'''<!doctype html>
 </main>
 <footer class="wrap foot muted"><p>Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL). Shadow method after cityshade (MIT). Direct sun only, clear sky, no trees. Written by Yanni Papoutsi, Rome. Updated 10 September 2026.</p></footer>
 <script src="/vendor/leaflet.js"></script>
-<script id="venues" type="application/json">{VJSON}</script>
-<script>
-(function(){{
-  var V=JSON.parse(document.getElementById('venues').textContent);
-  var COL={{morning:'#f0a202',midday:'#c2562b',afternoon:'#6a4c93'}},LAB={{morning:'morning',midday:'midday',afternoon:'afternoon'}},CAP={{morning:3,midday:4,afternoon:4.5}};
-  var map=L.map('rmap',{{scrollWheelZoom:false}}).setView([41.871,12.482],14);
-  L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png',{{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}}).addTo(map);
-  var layer=L.layerGroup().addTo(map);
-  function best(v){{var b='morning',m=-1;['morning','midday','afternoon'].forEach(function(w){{var x=v[w]/CAP[w];if(x>m){{m=x;b=w;}}}});return b;}}
-  function draw(mode){{
-    layer.clearLayers();
-    V.forEach(function(v){{
-      var w=mode==='best'?best(v):mode,h=v[w],frac=Math.min(1,h/CAP[w]);
-      var grey=h<1,r=grey?4:4+frac*9;
-      var m=L.circleMarker([v.lat,v.lon],{{radius:r,color:'#2b2118',weight:1,fillColor:grey?'#b8b0a6':COL[w],fillOpacity:grey?.6:.9}});
-      m.bindPopup('<strong>'+v.name+'</strong><br>'+v.kind+(v.street?' · '+v.street:'')+'<br>Morning '+v.morning+' h · Midday '+v.midday+' h · Afternoon '+v.afternoon+' h<br>Sun: '+(v.runs||'none')+'<br><a href="/?lat='+v.lat+'&lon='+v.lon+'&name='+encodeURIComponent(v.name)+'">Check any date</a>');
-      m.addTo(layer); if(!grey) m.bringToFront();
-    }});
-  }}
-  draw('best'); map.fitBounds(V.map(function(v){{return [v.lat,v.lon];}}),{{padding:[20,20]}});
-  document.querySelectorAll('.lg').forEach(function(b){{b.addEventListener('click',function(){{document.querySelectorAll('.lg').forEach(function(x){{x.classList.remove('on');}});b.classList.add('on');draw(b.dataset.w);}});}});
-}})();
-</script>
+<script src="/rome-map.js"></script>
 </body>
 </html>'''
-import os; os.makedirs('rome-sunny-cafes',exist_ok=True); open('rome-sunny-cafes/index.html','w',encoding='utf-8').write(page); print('ok',n)
+import os; os.makedirs('rome-sunny-cafes',exist_ok=True); open('rome-sunny-cafes/index.html','w',encoding='utf-8').write(page)
+open('rome-map.js','w',encoding='utf-8').write(JS.replace('{VJSON}',VJSON)); print('ok',n)

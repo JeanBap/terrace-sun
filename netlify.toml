@@ -14,3 +14,24 @@
   for = "/*.js"
   [headers.values]
     Cache-Control = "public, max-age=3600"
+
+[[redirects]]
+  from = "/hotels/"
+  to = "/?mode=hotel"
+  status = 301
+[[redirects]]
+  from = "/hosts/"
+  to = "/?mode=host"
+  status = 301
+[[redirects]]
+  from = "/solar/"
+  to = "/?mode=solar"
+  status = 301
+[[redirects]]
+  from = "/weddings/"
+  to = "/?mode=wedding"
+  status = 301
+[[redirects]]
+  from = "/cities/"
+  to = "/?mode=city"
+  status = 301

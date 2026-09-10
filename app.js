@@ -5,7 +5,21 @@
   const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const DIRS = { N: 'north', NNE: 'north-north-east', NE: 'north-east', ENE: 'east-north-east', E: 'east', ESE: 'east-south-east', SE: 'south-east', SSE: 'south-south-east', S: 'south', SSW: 'south-south-west', SW: 'south-west', WSW: 'west-south-west', W: 'west', WNW: 'west-north-west', NW: 'north-west', NNW: 'north-north-west' };
-  const MODE = document.body.dataset.mode || 'cafe';
+  const MODES = {
+    cafe: { label: 'Café name or coordinates', ph: 'Bar Fratelli Capone, Rome  or  41.8757, 12.4757', lede: 'When does direct sun reach the terrace? Type the café name, address, coordinates or a Google Maps link.', empty: 'The times direct sun reaches each street-facing wall and the tables in front, whether it is sunny right now, a shadow map you can play through the day, and the sunniest cafés nearby.', hint: 'Click anywhere on the map to check that spot. Coloured dots are nearby cafés, brighter means more sun.' },
+    hotel: { label: 'Hotel name or address', ph: 'Hotel Santa Maria, Rome', lede: 'Which rooms get the morning sun? Is the terrace lit at aperitivo time? Type the hotel, then pick the floor.', empty: 'Sun times on the windows of each wall, floor by floor, plus a sentence you can paste into the room description.', hint: 'Click the hotel building on the map, or the terrace itself.' },
+    host: { label: 'Address of the flat', ph: 'Via Marmorata 25, Roma', lede: '"Sunny balcony" is a claim. "Sun on the balcony from 10:30 to 17:40" is a fact. Type the address, pick your floor.', empty: 'Sun times on the windows and balcony of each wall, floor by floor, plus listing text to copy.', hint: 'Click the building on the map.' },
+    solar: { label: 'Address of the roof', ph: 'Address', lede: 'Is the roof shaded by neighbours? Type the address and get the unshaded share by month, before a site visit.', empty: 'Unshaded share of daylight on the roof for each month, and sun on each wall by floor for balcony panels. Not a kWh estimate.', hint: 'Click the roof on the map.' },
+    wedding: { label: 'Venue name or address', ph: 'Venue', lede: 'Will guests squint at 17:00? Where will the sun be behind the couple? Type the venue, set the date, click the exact spot.', empty: 'Sun and shade for your start and end time, which side the sun comes from, sunset and golden hour, and a shadow map you can play through the event.', hint: 'Click the exact spot for the ceremony or the tables.' },
+    city: { label: 'Place or coordinates', ph: 'Piazza Testaccio, Roma', lede: 'Where is a bench in shade at 14:00 in July? Which side of the street is the cool route? Click any spot, any date.', empty: 'Sun times at the pin, on any date, with a shadow map to play through the day.', hint: 'Click the bus stop, bench or playground on the map.' }
+  };
+  let MODE = 'cafe';
+  function setMode(m, recompute) {
+    MODE = MODES[m] ? m : 'cafe'; const c = MODES[MODE];
+    document.body.dataset.mode = MODE; $('mode').value = MODE;
+    $('qlabel').textContent = c.label; $('q').placeholder = c.ph; $('lede').textContent = c.lede; $('emptyText').textContent = c.empty; $('maphint').textContent = c.hint;
+    if (recompute && S.model && !S.busy) compute();
+  }
   const S = { model: null, lat: null, lon: null, name: '', tz: null, res: null, busy: false, yearToken: 0, nearToken: 0, floorToken: 0, roofToken: 0, floor: 0 };
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
@@ -138,6 +152,7 @@
     navigator.geolocation.getCurrentPosition(p => { const la = p.coords.latitude, lo = p.coords.longitude; $('q').value = `${la.toFixed(5)}, ${lo.toFixed(5)}`; showPending(la, lo); start(la, lo, null); },
       () => status('Could not get your location. Click the map instead.', true), { enableHighAccuracy: true, timeout: 10000 });
   });
+  $('mode').addEventListener('change', () => setMode($('mode').value, true));
   $('date').addEventListener('change', () => { if (S.model && !S.busy) compute(); });
 
   async function start(lat, lon, name) {
@@ -187,10 +202,10 @@
     const [t0, t1] = dayWindow(y, m, d, S.tz);
     const F = E.findFacades(S.model);
     if (F.target && S.floorOverride && S.floorOverride.id === F.target.id) F.target.h = S.floorOverride.n * E.M_PER_LEVEL;
-    const res = E.analyse(S.model, S.lat, S.lon, t0, t1, { stepMin: STEP, facades: F.facades, point: (F.pointInside && MODE !== 'wedding') ? null : [0, 0] });
+    const res = E.analyse(S.model, S.lat, S.lon, t0, t1, { stepMin: STEP, facades: F.facades, point: (F.pointInside && MODE !== 'wedding' && MODE !== 'city') ? null : [0, 0] });
     Object.assign(S, { res, F, t0, ymd: [y, m, d] });
     const u = new URL(location.href); u.search = '';
-    u.searchParams.set('lat', S.lat.toFixed(6)); u.searchParams.set('lon', S.lon.toFixed(6)); u.searchParams.set('date', $('date').value);
+    u.searchParams.set('lat', S.lat.toFixed(6)); u.searchParams.set('lon', S.lon.toFixed(6)); u.searchParams.set('date', $('date').value); if (MODE !== 'cafe') u.searchParams.set('mode', MODE);
     if (!/^Spot at/.test(S.name)) u.searchParams.set('name', S.name);
     history.replaceState(null, '', u);
     drawMap(); render(); initSlider(); year(); nearby(); floors(); roof(); eventCheck();
@@ -233,14 +248,14 @@
     const main = res.facades[0];
     let answer;
     if (main) {
-      answer = `On ${fmtDate(y, m, d)}, the ${DIRS[main.faces]}-facing wall${main.street ? ' on ' + esc(main.street) : ''} gets direct sun ${main.wallSum.runs.length ? runsText(main.wallSum.runs) : 'at no time'} (${hrs(main.wallSum.hours)}). Tables in front: ${hrs(main.paveSum.hours)}${main.paveSum.runs.length ? ', ' + runsText(main.paveSum.runs) : ''}.`;
+      answer = `On ${fmtDate(y, m, d)}, the ${DIRS[main.faces]}-facing wall${main.street ? ' on ' + esc(main.street) : ''} gets direct sun ${main.wallSum.runs.length ? runsText(main.wallSum.runs) : 'at no time'} (${hrs(main.wallSum.hours)}).` + (MODE === 'cafe' ? ` Tables in front: ${hrs(main.paveSum.hours)}${main.paveSum.runs.length ? ', ' + runsText(main.paveSum.runs) : ''}.` : '');
     } else if (res.point) {
       answer = `No building found at this spot. At table height here, direct sun on ${fmtDate(y, m, d)}: ${runsText(res.point.sum.runs)} (${hrs(res.point.sum.hours)}).`;
     } else answer = 'No street-facing walls found near this point. Try clicking right next to the café on the map.';
     const cov = Math.round(model.heightCoverage * 100);
     const nowK = Math.floor((Date.now() - S.t0) / (STEP * 6e4)), isToday = nowK >= 0 && nowK < res.times.length;
     let nowLine = '';
-    if (isToday && main) {
+    if (isToday && main && MODE === 'cafe') {
       const lit = main.wall[nowK] >= 0.5, litT = main.pave[nowK] >= 0.5;
       const next = (arr, want) => { for (let k = nowK + 1; k < arr.length; k++) if ((arr[k] >= 0.5) === want) return res.times[k]; return null; };
       const sunUp = res.sun[nowK].alt > 0;
@@ -256,44 +271,45 @@
       ${nowLine ? `<p class="now"><span class="pulse"></span>${nowLine}</p>` : ''}
       <div class="chips">${chips}</div>
       <p class="note muted"><span style="color:var(--sun)">■</span> direct sun · <span style="color:#cfc4b5">■</span> shade · <span style="color:#9d948a">■</span> night</p></div>`;
+    { const h0 = h; h = '';     if (F.target && res.facades.length && (MODE === 'hotel' || MODE === 'host' || MODE === 'solar')) {
+        const nF = Math.max(1, Math.round(F.target.h / E.M_PER_LEVEL));
+        const opts = Array.from({ length: nF }, (_, f) => `<option value="${f}"${f === (S.floor || 0) ? ' selected' : ''}>${floorName(f)}</option>`).join('');
+        h += `<article class="card" id="homeCard"><h3>${MODE === 'hotel' ? 'Rooms by floor' : MODE === 'solar' ? 'Balcony panels by floor' : 'Flat by floor'}</h3>
+          <p class="note muted">How much sun comes through the windows depends on the floor: higher floors clear the buildings opposite. This building is about ${Math.round(F.target.h)} m tall (${nF} floor${nF > 1 ? 's' : ''}${F.target.tagged ? '' : ', estimated'}).</p>
+          <div class="settings"><div class="field"><label for="floor">${MODE === 'hotel' ? 'Room is on' : 'Flat is on'}</label><select id="floor">${opts}</select></div><div class="field"><label for="nfloors">Floors in building</label><input id="nfloors" type="number" min="1" max="60" value="${nF}"></div><button type="button" class="ghost" id="copyListing">Copy listing text</button></div>
+          <p class="answer" id="floorAnswer">Calculating…</p>
+          <div style="overflow-x:auto"><table class="year" id="floorTbl"></table></div>
+          <p class="note muted">Hours of direct sun on each wall's windows, at 1.5 m above each floor. Click a row to select that floor.</p></article>`;
+      }
+      if (MODE === 'solar' && F.target) {
+        h += `<article class="card" id="roofCard"><h3>Roof and balcony solar check <span class="tag">pre-visit</span></h3><p class="answer" id="roofAnswer">Calculating…</p><table class="year" id="roofTbl"></table><p class="note muted">Direct-beam hours on the roof of this building (${Math.round(F.target.h)} m) on the 21st of each month, and on a balcony at the chosen floor for each wall. Not an irradiance model: use it to rank sites and spot shading from neighbours, then run PVGIS or a proper yield tool for kWh.</p></article>`;
+      }
+      if (MODE === 'wedding') {
+        h += `<article class="card" id="eventCard"><h3>Event time check</h3><div class="settings"><div class="field"><label for="evStart">Starts</label><input id="evStart" type="time" value="${S.evStart || '17:00'}"></div><div class="field"><label for="evEnd">Ends</label><input id="evEnd" type="time" value="${S.evEnd || '19:00'}"></div></div><p class="answer" id="evAnswer"></p><p class="note muted">Guests at the pin, at table height. "Sun from the west" means the sun is behind anyone facing west, so face the ceremony the other way. Golden hour is the last hour before sunset.</p></article>`;
+      }
+
+      h = h0 + h; }
     res.facades.forEach((f, i) => {
       h += `<article class="card"><h3><span class="badge">${i + 1} · ${f.faces}</span>${f.street ? esc(f.street) : 'Wall'} <span class="tag">${Math.round(f.length)} m of wall</span>${i === 0 ? '<span class="tag">nearest to pin</span>' : ''}</h3>
         <div class="rows">
           <span></span>${axis()}<span></span>
           <span class="lbl">Wall</span>${timelineSVG(f.wall, i)}<span class="hrs">${hrs(f.wallSum.hours)}</span>
           <span class="times">${runsText(f.wallSum.runs)}</span>
-          <span class="lbl">Tables</span>${timelineSVG(f.pave, i)}<span class="hrs">${hrs(f.paveSum.hours)}</span>
-          <span class="times">${runsText(f.paveSum.runs)}</span>
+          ${MODE === 'cafe' ? `<span class="lbl">Tables</span>${timelineSVG(f.pave, i)}<span class="hrs">${hrs(f.paveSum.hours)}</span><span class="times">${runsText(f.paveSum.runs)}</span>` : ''}
         </div></article>`;
     });
-    if (res.point && res.facades.length) {
-      h += `<article class="card"><h3><span class="badge">Pin</span>At the pin, table height</h3><div class="rows"><span class="lbl">Sun</span>${timelineSVG(res.point.lit, 99)}<span class="hrs">${hrs(res.point.sum.hours)}</span><span class="times">${runsText(res.point.sum.runs)}</span></div></article>`;
+    if (res.point && res.facades.length && (MODE === 'wedding' || MODE === 'city')) {
+      h += `<article class="card"><h3><span class="badge">Pin</span>At the pin, 1 m above ground</h3><div class="rows"><span class="lbl">Sun</span>${timelineSVG(res.point.lit, 99)}<span class="hrs">${hrs(res.point.sum.hours)}</span><span class="times">${runsText(res.point.sum.runs)}</span></div></article>`;
     } else if (res.point) {
       h += `<article class="card"><div class="rows"><span class="lbl">Sun</span>${timelineSVG(res.point.lit, 99)}<span class="hrs">${hrs(res.point.sum.hours)}</span></div></article>`;
     }
     h += `<article class="card" id="yearCard"><h3>Through the year <span class="tag">21st of each month</span></h3><table class="year" id="yearTbl"><tbody><tr><td class="muted" colspan="4">Calculating…</td></tr></tbody></table>
       <p class="note muted"><span style="color:var(--sun)">■</span> wall · <span style="color:var(--accent)">■</span> tables</p></article>`;
-    if (F.target && res.facades.length) {
-      const nF = Math.max(1, Math.round(F.target.h / E.M_PER_LEVEL));
-      const opts = Array.from({ length: nF }, (_, f) => `<option value="${f}"${f === (S.floor || 0) ? ' selected' : ''}>${floorName(f)}</option>`).join('');
-      h += `<article class="card" id="homeCard"><h3>Apartment or house on this building <span class="tag">for buyers, renters and estate agents</span></h3>
-        <p class="note muted">How much sun comes through the windows depends on the floor: higher floors clear the buildings opposite. This building is about ${Math.round(F.target.h)} m tall (${nF} floor${nF > 1 ? 's' : ''}${F.target.tagged ? '' : ', estimated'}).</p>
-        <div class="settings"><div class="field"><label for="floor">Flat is on</label><select id="floor">${opts}</select></div><div class="field"><label for="nfloors">Floors in building</label><input id="nfloors" type="number" min="1" max="60" value="${nF}"></div><button type="button" class="ghost" id="copyListing">Copy listing text</button></div>
-        <p class="answer" id="floorAnswer">Calculating…</p>
-        <div style="overflow-x:auto"><table class="year" id="floorTbl"></table></div>
-        <p class="note muted">Hours of direct sun on each wall's windows, at 1.5 m above each floor. Click a row to select that floor.</p></article>`;
-    }
-    if (MODE === 'solar' && F.target) {
-      h += `<article class="card" id="roofCard"><h3>Roof and balcony solar check <span class="tag">pre-visit</span></h3><p class="answer" id="roofAnswer">Calculating…</p><table class="year" id="roofTbl"></table><p class="note muted">Direct-beam hours on the roof of this building (${Math.round(F.target.h)} m) on the 21st of each month, and on a balcony at the chosen floor for each wall. Not an irradiance model: use it to rank sites and spot shading from neighbours, then run PVGIS or a proper yield tool for kWh.</p></article>`;
-    }
-    if (MODE === 'wedding') {
-      h += `<article class="card" id="eventCard"><h3>Event time check</h3><div class="settings"><div class="field"><label for="evStart">Starts</label><input id="evStart" type="time" value="${S.evStart || '17:00'}"></div><div class="field"><label for="evEnd">Ends</label><input id="evEnd" type="time" value="${S.evEnd || '19:00'}"></div></div><p class="answer" id="evAnswer"></p><p class="note muted">Guests at the pin, at table height. "Sun from the west" means the sun is behind anyone facing west, so face the ceremony the other way. Golden hour is the last hour before sunset.</p></article>`;
-    }
-    h += `<article class="card" id="nearby" hidden><h3>Sunniest places nearby <span class="tag">tables, this date</span></h3><table class="year" id="nearbyTbl"></table><p class="note muted">Every named café, bar and restaurant within 220 m. Click one to check it.</p></article>`;
-    h += `<article class="card"><h3>Building heights</h3>
+    if (MODE === 'cafe') h += `<article class="card" id="nearby" hidden><h3>Sunniest places nearby <span class="tag">tables, this date</span></h3><table class="year" id="nearbyTbl"></table><p class="note muted">Every named café, bar and restaurant within 220 m. Click one to check it.</p></article>`;
+    h += `<details class="card"><summary><strong>Building heights and limits</strong> <span class="tag ${cov < 50 ? 'warn' : ''}">${cov}% real heights</span></summary>
       <p class="note ${cov < 50 ? 'warn' : 'muted'}">${cov}% of nearby building area has a real height in OpenStreetMap. The rest is assumed to be ${model.defaultHeight} m tall${model.taggedSamples >= 3 ? ' (typical of the tagged buildings nearby)' : ''}.${cov < 50 ? ' If the street is lined with 5 or 6 storey blocks, try 18 to 20 m.' : ''}</p>
       <form class="settings" id="hform"><div class="field"><label for="hdef">Assumed height (m)</label><input id="hdef" type="number" min="2" max="200" step="0.5" value="${model.defaultHeight}"></div><button class="ghost" type="submit">Recalculate</button></form>
-      <p class="note muted">Direct sun on a clear day. Flat ground. Trees, awnings, umbrellas and hills are not included. Buildings within ${RADIUS} m are used.</p></article>`;
+      <p class="note muted">Direct sun on a clear day. Flat ground. Trees, awnings, umbrellas and hills are not included. Buildings within ${RADIUS} m are used.</p></details>`;
     out.innerHTML = h;
     document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { $('date').value = b.dataset.date; compute(); }));
     $('share').addEventListener('click', async () => {
@@ -377,7 +393,7 @@
   const venueLayer = L.layerGroup().addTo(map);
   function nearby() {
     venueLayer.clearLayers();
-    const card = $('nearby'); if (!card) return;
+    const card = $('nearby'); if (!card) { ++S.nearToken; return; }
     const vs = (S.venues || []).filter(v => Math.hypot((v.lat - S.lat) * 110574, (v.lon - S.lon) * 111320 * Math.cos(S.lat * RAD)) <= 220);
     if (!vs.length) { card.hidden = true; return; }
     card.hidden = false;
@@ -468,6 +484,7 @@
 
   // ---------- boot from URL ----------
   const P = new URLSearchParams(location.search);
+  setMode(P.get('mode') || 'cafe', false);
   if (P.get('date') && /^\d{4}-\d{2}-\d{2}$/.test(P.get('date'))) $('date').value = P.get('date');
   if (P.get('lat') && P.get('lon')) { const la = +P.get('lat'), lo = +P.get('lon'); if (!isNaN(la) && !isNaN(lo)) { $('q').value = P.get('name') || `${la}, ${lo}`; start(la, lo, P.get('name')); } }
   else if (P.get('q')) { $('q').value = P.get('q'); $('form').requestSubmit(); }
