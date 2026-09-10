@@ -1,0 +1,10 @@
+# Terrace Sun
+
+> Free web tool that tells you when direct sunlight reaches the walls and outdoor tables of a café (or any spot) on a chosen date.
+
+- Input: a café name (geocoded with Nominatim), coordinates, or a Google Maps link, plus a date.
+- Method: building footprints and heights from OpenStreetMap (Overpass API) within 250 m; a 2.5D ray is traced towards the sun every 5 minutes for sample points along each street-facing wall (1.5 m high) and 2.5 m in front of it (table height, 1 m).
+- Output: sun time ranges and hours per wall, a shadow map with a time slider, and monthly totals on the 21st of each month.
+- Limits: direct beam only, clear sky, flat ground, no trees or awnings; untagged building heights are estimated and adjustable.
+- Shareable URL format: https://terrace-sun.netlify.app/?lat=41.87726&lon=12.47359&date=2026-09-10&name=Cafe
+- Real estate mode: for the building at the pin, shows direct sun hours on the windows of each floor (ground to top) per street-facing wall, with a copyable listing sentence.
