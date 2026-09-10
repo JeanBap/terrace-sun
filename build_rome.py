@@ -25,6 +25,7 @@ for q in Q:
     sec.append('<h3>Best in winter (21 December, whole day)</h3><p>'+', '.join(f'<a href="{link(v)}">{html.escape(v["name"])}</a> ({v["dec_total"]:.1f} h)' for v in win)+'</p>')
     sec.append('</section>'); sections.append('\n'.join(sec))
 n=len(V)
+VJSON=json.dumps([{'name':v['name'],'kind':KIND[v['kind']],'street':v['street'],'lat':round(v['lat'],6),'lon':round(v['lon'],6),'morning':v['sep_morning'],'midday':v['sep_midday'],'afternoon':v['sep_afternoon'],'runs':v['sep_runs']} for v in V],ensure_ascii=False).replace('</','<\\/')
 page=f'''<!doctype html>
 <html lang="en-GB">
 <head>
@@ -35,6 +36,7 @@ page=f'''<!doctype html>
 <link rel="canonical" href="{BASE}/rome-sunny-cafes/">
 <meta property="og:type" content="article"><meta property="og:title" content="Sunniest cafés in Testaccio, San Saba and Garbatella"><meta property="og:description" content="Where to sit in the sun in Rome's southern rioni, morning, midday and afternoon. Computed from building shadows, not guessed."><meta property="og:url" content="{BASE}/rome-sunny-cafes/"><meta property="og:image" content="{BASE}/og.png"><meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='26' fill='%23f0a202'/></svg>">
+<link rel="stylesheet" href="/vendor/leaflet.css">
 <link rel="stylesheet" href="/style.css">
 <script type="application/ld+json">
 {json.dumps({"@context":"https://schema.org","@type":"Article","headline":"Sunniest cafés in Testaccio, San Saba and Garbatella, by time of day","datePublished":"2026-09-10","dateModified":"2026-09-10","author":{"@type":"Person","name":"Yanni Papoutsi"},"publisher":{"@type":"Organization","name":"Terrace Sun","url":BASE+"/"},"mainEntityOfPage":BASE+"/rome-sunny-cafes/","about":[{"@type":"Place","name":q+", Rome"} for q in Q]},ensure_ascii=False)}
@@ -48,6 +50,16 @@ page=f'''<!doctype html>
 <p class="muted small">Jump to: <a href="#testaccio">Testaccio</a> · <a href="#san-saba">San Saba</a> · <a href="#garbatella">Garbatella</a> · <a href="#method">method and limits</a></p>
 </div></header>
 <main class="wrap">
+<section class="card mapcard">
+<div class="legend" role="group" aria-label="Time period">
+  <button type="button" class="lg on" data-w="best"><span class="sw" style="background:linear-gradient(90deg,#f0a202,#c2562b,#6a4c93)"></span>Best time of each café</button>
+  <button type="button" class="lg" data-w="morning"><span class="sw" style="background:#f0a202"></span>Morning 8 to 11</button>
+  <button type="button" class="lg" data-w="midday"><span class="sw" style="background:#c2562b"></span>Midday 11 to 15</button>
+  <button type="button" class="lg" data-w="afternoon"><span class="sw" style="background:#6a4c93"></span>Afternoon 15 to sunset</button>
+</div>
+<div id="rmap" aria-label="Map of sunny cafés"></div>
+<p class="note muted">Bigger dot, more sun in that period. Grey dots get under 1 h in the chosen period. Click a dot for the sun times and a link to the full check. September day, tables outside.</p>
+</section>
 <p class="answer">Short version. Morning sun: the east-facing side of Via Marmorata and Piazza Testaccio in Testaccio, Caffè il Dollaro, Bar Foschi and Santa Garba in Garbatella, Tram Depot in San Saba. Midday: almost any piazza-side table. Afternoon: Oasi della Birra and Il Seme e la Foglia in Testaccio, Verso and Bar Piramide in San Saba, al Ponte and Coffeebar da Roma in Garbatella.</p>
 {''.join(sections)}
 <section class="card" id="method"><h2>Method and limits</h2>
@@ -57,6 +69,30 @@ page=f'''<!doctype html>
 </section>
 </main>
 <footer class="wrap foot muted"><p>Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL). Shadow method after cityshade (MIT). Direct sun only, clear sky, no trees. Written by Yanni Papoutsi, Rome. Updated 10 September 2026.</p></footer>
+<script src="/vendor/leaflet.js"></script>
+<script id="venues" type="application/json">{VJSON}</script>
+<script>
+(function(){{
+  var V=JSON.parse(document.getElementById('venues').textContent);
+  var COL={{morning:'#f0a202',midday:'#c2562b',afternoon:'#6a4c93'}},LAB={{morning:'morning',midday:'midday',afternoon:'afternoon'}},CAP={{morning:3,midday:4,afternoon:4.5}};
+  var map=L.map('rmap',{{scrollWheelZoom:false}}).setView([41.871,12.482],14);
+  L.tileLayer('https://tile.openstreetmap.org/{{z}}/{{x}}/{{y}}.png',{{maxZoom:19,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}}).addTo(map);
+  var layer=L.layerGroup().addTo(map);
+  function best(v){{var b='morning',m=-1;['morning','midday','afternoon'].forEach(function(w){{var x=v[w]/CAP[w];if(x>m){{m=x;b=w;}}}});return b;}}
+  function draw(mode){{
+    layer.clearLayers();
+    V.forEach(function(v){{
+      var w=mode==='best'?best(v):mode,h=v[w],frac=Math.min(1,h/CAP[w]);
+      var grey=h<1,r=grey?4:4+frac*9;
+      var m=L.circleMarker([v.lat,v.lon],{{radius:r,color:'#2b2118',weight:1,fillColor:grey?'#b8b0a6':COL[w],fillOpacity:grey?.6:.9}});
+      m.bindPopup('<strong>'+v.name+'</strong><br>'+v.kind+(v.street?' · '+v.street:'')+'<br>Morning '+v.morning+' h · Midday '+v.midday+' h · Afternoon '+v.afternoon+' h<br>Sun: '+(v.runs||'none')+'<br><a href="/?lat='+v.lat+'&lon='+v.lon+'&name='+encodeURIComponent(v.name)+'">Check any date</a>');
+      m.addTo(layer); if(!grey) m.bringToFront();
+    }});
+  }}
+  draw('best'); map.fitBounds(V.map(function(v){{return [v.lat,v.lon];}}),{{padding:[20,20]}});
+  document.querySelectorAll('.lg').forEach(function(b){{b.addEventListener('click',function(){{document.querySelectorAll('.lg').forEach(function(x){{x.classList.remove('on');}});b.classList.add('on');draw(b.dataset.w);}});}});
+}})();
+</script>
 </body>
 </html>'''
 import os; os.makedirs('rome-sunny-cafes',exist_ok=True); open('rome-sunny-cafes/index.html','w',encoding='utf-8').write(page); print('ok',n)

@@ -93,3 +93,9 @@ select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius
 .rank{width:100%;border-collapse:collapse;font-size:.9rem}.rank th{text-align:left;font-size:.78rem;color:var(--muted);padding:4px 6px;border-bottom:1px solid var(--line)}.rank td{padding:6px;border-bottom:1px solid var(--line);vertical-align:top}.rank .hrs{white-space:nowrap}
 @media (max-width:600px){.rank th:nth-child(4),.rank td:nth-child(4){display:none}}
 main.wrap>.answer{margin-top:8px}
+.mapcard{margin-top:10px;padding:12px}
+#rmap{height:min(60vh,520px);min-height:300px;border-radius:8px;border:1px solid var(--line);margin-top:8px}
+.legend{display:flex;gap:6px;flex-wrap:wrap}
+.lg{min-height:34px;padding:4px 10px;font-size:.85rem;background:var(--card);color:var(--ink);border:1px solid var(--line);font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.lg.on{border-color:var(--ink);background:var(--sunsoft)}
+.sw{width:14px;height:14px;border-radius:50%;display:inline-block;border:1px solid #2b2118}
