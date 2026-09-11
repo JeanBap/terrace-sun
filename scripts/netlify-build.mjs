@@ -15,6 +15,7 @@ fs.writeFileSync('lib/discovery-files.mjs', out + '};\n');
 const site = process.env.SITE_NAME;
 if (site && site !== 'terrace-sun') {
   fs.writeFileSync('_headers', '/*\n  X-Robots-Tag: noindex\n');
+  fs.writeFileSync('_redirects', '/account/*  https://terrace-sun.netlify.app/account/:splat  302!\n/account  https://terrace-sun.netlify.app/account/  302!\n');
   console.log(`Site ${site} is a mirror: noindex header written.`);
 }
 console.log('discovery files bundled:', Object.keys(files).length);

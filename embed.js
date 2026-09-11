@@ -1,13 +1,14 @@
 /* Terrace Sun badge. One line on any listing page:
-   <script async src="https://terrace-sun.netlify.app/embed.js" data-lat="41.8772" data-lon="12.4736" data-floor="2" data-floors="5" data-name="Via Volta 3" data-agency="Your Agency"></script>
+   <script async src="https://terrace-sun.netlify.app/embed.js" data-lat="41.8772" data-lon="12.4736" data-floor="2" data-floors="5" data-name="Via Volta 3" data-agency="Your Agency" data-pk="ts_pk_live_..."></script>
    The badge computes in the visitor's browser from OpenStreetMap buildings (no server round-trip needed), caches the
    result for 7 days, and links to the branded report. */
 (function () {
   var s = document.currentScript; if (!s) return;
   var d = s.dataset, base = 'https://terrace-sun.netlify.app';
+  var pk = d.pk || (/^ts_pk_/.test(d.key || '') ? d.key : ''); // publishable key only; never put a secret key in a page
   var lat = parseFloat(d.lat), lon = parseFloat(d.lon), floor = parseInt(d.floor || '0', 10) || 0, floors = d.floors ? parseInt(d.floors, 10) : null;
   var q = 'lat=' + lat + '&lon=' + lon + '&floor=' + floor + (floors ? '&floors=' + floors : '') + (d.name ? '&name=' + encodeURIComponent(d.name) : '');
-  var reportUrl = base + '/report/?' + q + (d.agency ? '&agency=' + encodeURIComponent(d.agency) : '') + (d.logo ? '&logo=' + encodeURIComponent(d.logo) : '') + (d.agent ? '&agent=' + encodeURIComponent(d.agent) : '');
+  var reportUrl = base + '/report/?' + q + (d.agency ? '&agency=' + encodeURIComponent(d.agency) : '') + (d.logo ? '&logo=' + encodeURIComponent(d.logo) : '') + (d.agent ? '&agent=' + encodeURIComponent(d.agent) : '') + (pk ? '&pk=' + encodeURIComponent(pk) : '');
   var a = document.createElement('a'); a.href = reportUrl; a.target = '_blank'; a.rel = 'noopener';
   a.style.cssText = 'display:inline-flex;align-items:center;gap:8px;font:600 14px/1.2 system-ui,sans-serif;color:#1f1a15;text-decoration:none;border:1px solid #e8dfd2;border-radius:10px;padding:8px 12px;background:#fff';
   a.innerHTML = '<span style="width:14px;height:14px;border-radius:50%;background:#f0a202;box-shadow:0 0 0 3px #fde6b0"></span><span>Sun Score</span><span data-ts="v" style="color:#6e6255;font-weight:500">checking…</span>';
@@ -20,7 +21,7 @@
   var ck = 'ts:' + lat.toFixed(5) + ':' + lon.toFixed(5) + ':' + floor + ':' + (floors || '');
   try { var c = JSON.parse(localStorage.getItem(ck) || 'null'); if (c && Date.now() - c.t < 7 * 864e5) return show(c); } catch (e) { }
   // 1) fast path: cached server answer
-  fetch(base + '/api/v1/sun?' + q + (d.key ? '&key=' + encodeURIComponent(d.key) : '')).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) {
+  fetch(base + '/api/v1/sun?' + q + (pk ? '&pk=' + encodeURIComponent(pk) : '')).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) {
     if (!j || j.error) throw 0;
     var r = { grade: j.grade, score: j.sun_score, hours: j.annual_avg_direct_sun_hours, t: Date.now() }; show(r); try { localStorage.setItem(ck, JSON.stringify(r)); } catch (e) { }
   }).catch(function () {

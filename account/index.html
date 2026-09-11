@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Terrace Sun account</title>
+<meta name="description" content="Your Terrace Sun plan, API keys, usage and billing.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='26' fill='%23f0a202'/></svg>">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/listings.css">
+<script src="/t.js" defer></script>
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body class="sales">
+<header class="top"><div class="wrap">
+  <div class="titlerow"><a class="brandlink" href="/"><span class="sun" aria-hidden="true"></span>Terrace Sun</a><nav class="topnav"><a href="/listings/#pricing">Pricing</a><a href="/listings/#api">API</a><a href="/terms/">Terms</a></nav></div>
+</div></header>
+<main class="wrap acct">
+  <h1>Your account</h1>
+  <p id="msg" class="status" role="status" aria-live="polite"></p>
+
+  <section id="signin" class="card" hidden>
+    <h2>Sign in with your secret key</h2>
+    <p class="muted small">Paste the key that starts with <code>ts_sk_</code>. It is only sent to this site and is forgotten when you close the tab.</p>
+    <form id="signinForm">
+      <div class="field"><label for="skIn">Secret API key</label><input id="skIn" type="password" autocomplete="off" spellcheck="false" required placeholder="ts_sk_live_…"></div>
+      <button class="btn" type="submit">Open my account</button>
+    </form>
+    <p class="small muted">Just paid? Use the link Stripe sent you back to: it works for 30 days. Lost your key? <a href="/listings/#signup">Write to us</a> and we will rotate it. No plan yet? <a href="/listings/#pricing">See plans</a>.</p>
+  </section>
+
+  <section id="single" class="card keybox" hidden>
+    <h2>Your branded report</h2>
+    <p id="singleText" class="muted"></p>
+    <p class="copyrow"><a class="btn" id="singleLink" href="#">Open the report</a><button type="button" class="minibtn" data-copy="singleUrl">Copy link</button></p>
+    <p class="small muted" style="overflow-wrap:anywhere"><code id="singleUrl"></code></p>
+    <p class="small muted">Put the link in the listing, the brochure or a QR code. Print it to PDF from the report page. Keep this page: the link stays the same.</p>
+  </section>
+
+  <div id="acct" hidden>
+    <section id="newKey" class="card keybox" hidden>
+      <h2>Your secret API key</h2>
+      <p><strong>Copy it now and keep it on your server.</strong> We only store a fingerprint of it, so it cannot be shown again. If you lose it, rotate it below.</p>
+      <p class="copyrow"><code id="skVal"></code><button type="button" class="minibtn" data-copy="skVal">Copy</button></p>
+    </section>
+    <div class="grid2">
+      <section class="card"><h2>Plan</h2><p class="big" id="planName"></p><p id="planMeta" class="muted small"></p><p id="planWarn" class="note small" hidden></p><button type="button" class="btn" id="portalBtn">Manage billing, invoices and plan</button></section>
+      <section class="card"><h2>API calls this month</h2><p class="big"><span id="used">0</span> <span class="muted small" id="usedOf"></span></p><div class="meterbar"><i id="bar"></i></div><p class="small muted" id="usageNote"></p></section>
+    </div>
+    <section class="card">
+      <h2>Keys</h2>
+      <div style="overflow-x:auto"><table class="rtab small"><tbody>
+        <tr><td>Secret key<br><span class="muted">server side only, for <code>/api/v1/sun</code></span></td><td><code id="skMask"></code> <button type="button" class="minibtn" id="rotateBtn">Rotate</button></td></tr>
+        <tr><td>Publishable key<br><span class="muted">badges and report links, safe in public pages</span></td><td><code id="pkVal"></code> <button type="button" class="minibtn" data-copy="pkVal">Copy</button></td></tr>
+      </tbody></table></div>
+    </section>
+    <section class="card">
+      <h2>Use it</h2>
+      <h3 class="small">Badge on a listing</h3><pre><code id="snBadge"></code></pre>
+      <h3 class="small">Report link with your branding</h3><pre><code id="snLink"></code></pre>
+      <h3 class="small">JSON API from your server</h3><pre><code id="snApi"></code></pre>
+      <p class="small muted">Full reference: <a href="/listings/#api">API docs</a> and <a href="/openapi.json">OpenAPI spec</a>.</p>
+    </section>
+  </div>
+</main>
+<footer class="wrap foot muted"><p>Terrace Sun · <a href="/">Check any spot</a> · <a href="/listings/">For estate agents</a> · <a href="/terms/">Terms and privacy</a> · Payments by Stripe · Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL)</p></footer>
+<script src="/account.js"></script>
+</body>
+</html>

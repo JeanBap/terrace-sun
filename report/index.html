@@ -28,6 +28,7 @@
       <div>
         <h1 id="propName"></h1>
         <p class="muted" id="propMeta"></p>
+        <p class="muted small" id="agentLine" hidden></p>
       </div>
       <div class="scorebox"><div class="gradeLetter" id="gradeLetter">A</div><div><div class="scoreNum"><span id="scoreNum">0</span><span class="small">/100</span></div><div class="small muted">Sun Score</div></div></div>
     </section>
@@ -66,7 +67,19 @@
     <p class="small muted" id="verify"></p>
   </main>
 
-  <footer class="rfoot small muted"><span id="powered">Powered by <a href="https://terrace-sun.netlify.app/listings/">Terrace Sun</a></span> · Map data © OpenStreetMap contributors (ODbL)</footer>
+  <aside id="upsell" class="upsell noprint" hidden>
+    <p><strong>Estate agent?</strong> Put your agency name, logo and contact on this report instead of ours: €9 once, for this address. Or brand every listing from €19 a month: <a href="/listings/#pricing">plans</a>.</p>
+    <p class="note small" id="upsellNote" role="status" hidden></p>
+    <form id="buyForm" name="checkout" method="post" action="/api/checkout" class="buyform">
+      <input type="hidden" name="plan" value="single">
+      <label>Agency name <input name="agency" maxlength="80" required autocomplete="organization"></label>
+      <label>Logo URL (optional) <input name="logo" type="url" maxlength="400" placeholder="https://" pattern="https://.+"></label>
+      <label>Agent and phone (optional) <input name="agent" maxlength="80"></label>
+      <button class="btn" type="submit" data-track="single_buy">Use my branding: €9</button>
+    </form>
+  </aside>
+
+  <footer class="rfoot small muted"><span id="powered">Powered by <a href="https://terrace-sun.netlify.app/listings/">Terrace Sun</a></span> · Map data © OpenStreetMap contributors (ODbL) · <a href="/terms/">Terms</a></footer>
 </div>
 <script src="/vendor/leaflet.js"></script>
 <script src="/vendor/tz.js"></script>

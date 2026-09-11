@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terms, refunds and privacy | Terrace Sun</title>
+<meta name="description" content="Terms of use, billing, cancellation, refunds and privacy for Terrace Sun reports, badges and API.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='26' fill='%23f0a202'/></svg>">
+<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/listings.css">
+<script src="/t.js" defer></script>
+<link rel="canonical" href="https://terrace-sun.netlify.app/terms/">
+</head>
+<body class="sales">
+<header class="top"><div class="wrap">
+  <div class="titlerow"><a class="brandlink" href="/"><span class="sun" aria-hidden="true"></span>Terrace Sun</a><nav class="topnav"><a href="/listings/#pricing">Pricing</a><a href="/listings/#api">API</a><a href="/terms/">Terms</a></nav></div>
+</div></header>
+<main class="wrap legal">
+  <h1>Terms, refunds and privacy</h1>
+  <p class="muted small">Last updated 11 September 2026.</p>
+
+  <h2 id="service">The service</h2>
+  <p>Terrace Sun calculates hours of direct sun from OpenStreetMap buildings and a solar position model. Results are estimates for a clear day. They are not a survey, a valuation or a guarantee. Trees, awnings, balconies, terrain and weather are not included, and OpenStreetMap data can be incomplete. You are responsible for the addresses, floors and details you enter and for how you publish the results.</p>
+
+  <h2 id="billing">Plans and payment</h2>
+  <p>Paid plans are billed in advance by card through Stripe, monthly or yearly, and renew automatically until cancelled. Prices are in euro and exclude VAT. The Portal API plan includes 25,000 calls per monthly billing period; further calls cost €0.02 each and are charged on the next invoice. A single report is a one-time payment that adds your branding to the report for one address.</p>
+
+  <h2 id="cancel">Cancelling and changing plans</h2>
+  <p>Cancel or switch plans any time from your <a href="/account/">account page</a> under "Manage billing". A cancelled plan stays active until the end of the period you have paid for, then stops, with no further charges. Plan changes are prorated by Stripe.</p>
+
+  <h2 id="refunds">Refunds</h2>
+  <p>We do not refund partly used billing periods. If a report is wrong because of a fault on our side, tell us within 14 days of payment and we will correct it or refund that payment. If you buy as a consumer, your statutory rights are not affected.</p>
+
+  <h2 id="api">Keys and fair use</h2>
+  <p>Keep your secret key private and use it only from your own servers; the publishable key is for badges and report links. Each plan's monthly allowance is shown on the <a href="/listings/#pricing">pricing page</a>; above it the API answers with HTTP 429 until the next month. Keys are for your own organisation and must not be shared with other companies. We may suspend keys used to overload the service.</p>
+
+  <h2 id="data">Map data</h2>
+  <p>Map data © OpenStreetMap contributors, available under the Open Database License. Reports keep this attribution.</p>
+
+  <h2 id="privacy">Privacy</h2>
+  <ul>
+    <li><strong>Payments</strong> are processed by Stripe. We never see or store card numbers.</li>
+    <li><strong>Customers:</strong> we keep your Stripe customer ID, email, plan and status, a one-way fingerprint (SHA-256) of your secret key, your publishable key and monthly API call counts. Billing details stay in Stripe.</li>
+    <li><strong>Free API use</strong> is counted per caller with a one-way hash of the IP address, kept for the current month.</li>
+    <li><strong>Site analytics</strong> use no cookies and no advertising trackers. Visits are counted with an anonymous fingerprint that changes every day, and Do Not Track and Global Privacy Control are respected.</li>
+    <li><strong>Providers:</strong> Netlify (hosting), Stripe (payments), OpenStreetMap (map tiles) and public Overpass API servers (building data for the location you check).</li>
+    <li>To see, correct or delete your data, <a href="/listings/#signup">write to us</a>.</li>
+  </ul>
+
+  <h2 id="liability">Liability</h2>
+  <p>The service is provided as is. As far as the law allows, our total liability for any claim is limited to the amount you paid us in the 12 months before the claim.</p>
+
+  <h2 id="contact">Contact</h2>
+  <p>Use the <a href="/listings/#signup">contact form</a>. We reply within one business day.</p>
+</main>
+<footer class="wrap foot muted"><p>Terrace Sun · <a href="/">Check any spot</a> · <a href="/listings/">For estate agents</a> · <a href="/terms/">Terms and privacy</a> · Payments by Stripe · Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL)</p></footer>
+</body>
+</html>

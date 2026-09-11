@@ -33,3 +33,12 @@ body.report{background:#fff;color:#1f1a15}
 .leaflet-tile-pane{opacity:.55;filter:grayscale(.6)}
 @media print{.noprint{display:none!important}.rwrap{max-width:none;padding:0}#map{height:300px}body{font-size:12px}.report h2{break-after:avoid}.two,.tiles,.rtab,#map{break-inside:avoid}}
 @media (prefers-color-scheme:dark){body.report{background:#fff;color:#1f1a15}body.report .muted{color:#6e6255}body.report .answer{background:#fde6b0;color:#1f1a15}body.report .tile,body.report .scorebox{background:#fff}}
+.upsell{margin-top:24px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--card)}
+.upsell p{margin:0 0 8px}
+.upsell .note{background:var(--sunsoft);border-radius:8px;padding:6px 10px}
+.buyform{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:8px;align-items:end}
+.buyform label{display:flex;flex-direction:column;gap:3px;font-size:.8rem;font-weight:600;min-width:0}
+.buyform input{font:inherit;font-size:.9rem;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);min-width:0}
+.upsell .btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 14px;border-radius:8px;background:var(--accent);color:#fff;font:inherit;font-weight:600;border:0;cursor:pointer;white-space:nowrap}
+@media (max-width:760px){.buyform{grid-template-columns:1fr}}
+.samplebadge{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:#1f1a15;color:#fde6b0;border-radius:999px;padding:2px 8px;margin-left:6px}

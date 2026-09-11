@@ -14,7 +14,7 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
 {"@type":"Product","name":"Terrace Sun for listings","description":"Sun Score badge and sun-exposure report for property listings, plus a JSON API.","brand":{"@type":"Brand","name":"Terrace Sun"},"url":"https://terrace-sun.netlify.app/listings/","offers":[
-{"@type":"Offer","name":"Free","price":"0","priceCurrency":"EUR","description":"5 reports a month, Terrace Sun branding"},
+{"@type":"Offer","name":"Free","price":"0","priceCurrency":"EUR","description":"Badge and report links with Terrace Sun branding, 100 API calls a month"},
 {"@type":"Offer","name":"Agent","price":"19","priceCurrency":"EUR","description":"Per month. Unlimited reports, your logo, PDF, badge on every listing"},
 {"@type":"Offer","name":"Agency","price":"79","priceCurrency":"EUR","description":"Per month. 10 agents, API 3,000 calls, bulk CSV"},
 {"@type":"Offer","name":"Portal API","price":"390","priceCurrency":"EUR","description":"Per month. 25,000 API calls, SLA, custom scoring"}]},
@@ -26,7 +26,7 @@
 </head>
 <body class="sales">
 <header class="top"><div class="wrap">
-  <div class="titlerow"><a class="brandlink" href="/"><span class="sun" aria-hidden="true"></span>Terrace Sun</a><nav class="topnav"><a href="#pricing">Pricing</a><a href="#api">API</a><a href="/blog/sun-exposure-property-listings/">Guide</a><a href="/sun-hours/">Sun hours by city</a><a href="/report/?lat=41.8772592&lon=12.4735942&floor=2&floors=5&name=Via%20Alessandro%20Volta%2C%20Testaccio&agency=Demo%20Agency" rel="noopener">Sample report</a></nav></div>
+  <div class="titlerow"><a class="brandlink" href="/"><span class="sun" aria-hidden="true"></span>Terrace Sun</a><nav class="topnav"><a href="#pricing">Pricing</a><a href="#api">API</a><a href="/blog/sun-exposure-property-listings/">Guide</a><a href="/sun-hours/">Sun hours by city</a><a href="/account/">Account</a><a href="/report/?lat=41.8772592&lon=12.4735942&floor=2&floors=5&name=Via%20Alessandro%20Volta%2C%20Testaccio&agency=Demo%20Agency&pk=demo" rel="noopener">Sample report</a></nav></div>
 </div></header>
 
 <main class="wrap">
@@ -35,9 +35,9 @@
       <p class="eyebrow">For estate agents, portals and developers</p>
       <h1>"Is it bright?" is the first question. Answer it with data.</h1>
       <p class="lede">Put a <strong>Sun Score</strong> and a full sun-exposure report on every listing: hours of direct sun on each side of the home, at its floor, in every season. Computed from the surrounding buildings, not from the agent's opinion. One line of code, or one link.</p>
-      <div class="ctas"><a class="btn" href="#signup" data-track="listings_start_free">Start free</a><a class="btn ghostbtn" data-track="listings_sample_report" href="/report/?lat=41.8772592&lon=12.4735942&floor=2&floors=5&name=Via%20Alessandro%20Volta%2C%20Testaccio&agency=Demo%20Agency" rel="noopener">See a sample report</a></div>
+      <div class="ctas"><a class="btn" href="#signup" data-track="listings_start_free">Start free</a><a class="btn ghostbtn" data-track="listings_sample_report" href="/report/?lat=41.8772592&lon=12.4735942&floor=2&floors=5&name=Via%20Alessandro%20Volta%2C%20Testaccio&agency=Demo%20Agency&pk=demo" rel="noopener">See a sample report</a></div>
       <p class="small muted">Live badge, this is what buyers see on the listing:</p>
-      <script async src="/embed.js" data-lat="41.8772592" data-lon="12.4735942" data-floor="2" data-floors="5" data-name="Via Alessandro Volta, Testaccio" data-agency="Demo Agency"></script>
+      <script async src="/embed.js" data-lat="41.8772592" data-lon="12.4735942" data-floor="2" data-floors="5" data-name="Via Alessandro Volta, Testaccio" data-agency="Demo Agency" data-pk="demo"></script>
     </div>
     <div class="mock">
       <div class="mockhead"><span class="mg g-A">A</span><div><div class="mockscore">76<span class="small">/100</span></div><div class="small muted">Sun Score</div></div></div>
@@ -62,14 +62,15 @@
   data-lat="41.8773" data-lon="12.4736"
   data-floor="2" data-floors="5"
   data-name="Via Volta 3" data-agency="Your Agency"
-  data-key="YOUR_KEY"&gt;&lt;/script&gt;</code></pre></div>
+  data-pk="YOUR_PUBLISHABLE_KEY"&gt;&lt;/script&gt;</code></pre></div>
       <div class="card"><span class="stepn">2</span><h3>Just a link</h3><p>No code at all. Build the report URL with the coordinates and floor, put it in the listing text, the brochure, a QR code, or hand it to the buyer at the viewing.</p><pre><code>https://terrace-sun.netlify.app/report/
   ?lat=41.8773&amp;lon=12.4736&amp;floor=2&amp;floors=5
   &amp;name=Via+Volta+3&amp;agency=Your+Agency
-  &amp;logo=https://youragency.com/logo.png</code></pre></div>
+  &amp;logo=https://youragency.com/logo.png
+  &amp;pk=YOUR_PUBLISHABLE_KEY</code></pre></div>
       <div class="card"><span class="stepn">3</span><h3>JSON API for portals</h3><p>One GET per listing. Cache it, show the score in search results, filter by "bright homes", sort by winter sun.</p><pre><code>GET https://terrace-sun.netlify.app/api/v1/sun
   ?lat=41.8773&amp;lon=12.4736&amp;floor=2&amp;floors=5
-Authorization: Bearer YOUR_KEY</code></pre></div>
+Authorization: Bearer YOUR_SECRET_KEY</code></pre></div>
     </div>
   </section>
 
@@ -91,13 +92,15 @@ Authorization: Bearer YOUR_KEY</code></pre></div>
   <section id="pricing">
     <h2>Pricing</h2>
     <p class="muted">Priced against one extra viewing, not against software. A single Rome sale pays for a decade of the Agency plan.</p>
+    <div class="billtoggle" role="group" aria-label="Billing period"><button type="button" class="on" data-interval="month" aria-pressed="true">Monthly</button><button type="button" data-interval="year" aria-pressed="false">Yearly <span>2 months free</span></button></div>
+    <p class="note" id="checkoutMsg" role="status" hidden></p>
     <div class="plans">
-      <div class="plan"><h3>Free</h3><div class="price">€0</div><p class="small muted">for trying it, and for private sellers</p><ul><li>5 reports a month</li><li>Badge and report link</li><li>Terrace Sun branding</li><li>Demo API key, 100 calls a month</li></ul><a class="btn ghostbtn" href="#signup" data-plan="free" data-track="plan_click" data-track-x="free">Start free</a></div>
-      <div class="plan best"><div class="ribbon">Most agents</div><h3>Agent</h3><div class="price">€19<span>/month</span></div><p class="small muted">or €190 a year</p><ul><li>Unlimited reports</li><li>Your name, logo and contact on every report</li><li>Print and PDF without our branding</li><li>Badge on all your listings</li><li>1,000 API calls a month</li></ul><a class="btn" href="#signup" data-plan="agent" data-track="plan_click" data-track-x="agent">Choose Agent</a></div>
-      <div class="plan"><h3>Agency</h3><div class="price">€79<span>/month</span></div><p class="small muted">or €790 a year</p><ul><li>Everything in Agent, for up to 10 agents</li><li>3,000 API calls a month</li><li>Bulk: send us a CSV of listings, get scores back</li><li>Agency-wide badge and report styling</li><li>Email support, next business day</li></ul><a class="btn ghostbtn" href="#signup" data-plan="agency" data-track="plan_click" data-track-x="agency">Choose Agency</a></div>
-      <div class="plan"><h3>Portal API</h3><div class="price">€390<span>/month</span></div><p class="small muted">25,000 calls, then €0.02 each</p><ul><li>Score in search results and filters</li><li>Uptime target and cache guidance</li><li>Custom scoring (garden, terrace, roof)</li><li>Your own subdomain for reports</li><li>Volume pricing above 250,000 calls</li></ul><a class="btn ghostbtn" href="#signup" data-plan="portal" data-track="plan_click" data-track-x="portal">Talk to us</a></div>
+      <div class="plan"><h3>Free</h3><div class="price">€0</div><p class="small muted">for trying it, and for private sellers</p><ul><li>Badge and report link</li><li>Terrace Sun branding on reports</li><li>API: 100 calls a month, no key needed</li></ul><a class="btn ghostbtn" href="#api" data-plan="free" data-track="plan_click" data-track-x="free">Use it free</a></div>
+      <div class="plan best"><div class="ribbon">Most agents</div><h3>Agent</h3><div class="price" data-month="€19&lt;span&gt;/month&lt;/span&gt;" data-year="€190&lt;span&gt;/year&lt;/span&gt;">€19<span>/month</span></div><p class="small muted" data-month="or €190 a year" data-year="€15.83 a month, billed yearly">or €190 a year</p><ul><li>Unlimited branded reports</li><li>Your name, logo and contact on every report</li><li>Print and PDF without our branding</li><li>Badge on all your listings</li><li>1,000 API calls a month</li></ul><form name="checkout" method="post" action="/api/checkout"><input type="hidden" name="plan" value="agent"><input type="hidden" name="interval" value="month"><button class="btn" data-plan="agent" data-track="plan_click" data-track-x="agent">Choose Agent</button></form></div>
+      <div class="plan"><h3>Agency</h3><div class="price" data-month="€79&lt;span&gt;/month&lt;/span&gt;" data-year="€790&lt;span&gt;/year&lt;/span&gt;">€79<span>/month</span></div><p class="small muted" data-month="or €790 a year" data-year="€65.83 a month, billed yearly">or €790 a year</p><ul><li>Everything in Agent, for up to 10 agents</li><li>3,000 API calls a month</li><li>Bulk: send us a CSV of listings, get scores back</li><li>Agency-wide badge and report styling</li><li>Email support, next business day</li></ul><form name="checkout" method="post" action="/api/checkout"><input type="hidden" name="plan" value="agency"><input type="hidden" name="interval" value="month"><button class="btn ghostbtn" data-plan="agency" data-track="plan_click" data-track-x="agency">Choose Agency</button></form></div>
+      <div class="plan"><h3>Portal API</h3><div class="price">€390<span>/month</span></div><p class="small muted">25,000 calls included, then €0.02 each</p><ul><li>Score in search results and filters</li><li>Usage-based: pay only for calls above 25,000</li><li>Uptime target and cache guidance</li><li>Custom scoring (garden, terrace, roof) on request</li><li>Volume pricing above 250,000 calls</li></ul><form name="checkout" method="post" action="/api/checkout"><input type="hidden" name="plan" value="portal"><input type="hidden" name="interval" value="month"><button class="btn ghostbtn" data-plan="portal" data-track="plan_click" data-track-x="portal">Start Portal API</button></form></div>
     </div>
-    <p class="small muted">Single report without a plan: €9, sent as a PDF with your address on it. Prices exclude VAT. Cancel any time. Payment by card; invoices for annual plans.</p>
+    <p class="small muted">Single report without a plan: €9 for one address, with your branding instead of ours: open the report and choose "Use my branding". Prices exclude VAT. Secure card payment by Stripe; your keys appear on your <a href="/account/">account page</a> the moment payment goes through. Cancel any time: the plan runs to the end of the period you paid for. <a href="/terms/">Terms and refunds</a>.</p>
   </section>
 
   <section id="api">
@@ -111,9 +114,11 @@ Authorization: Bearer YOUR_KEY</code></pre></div>
         <tr><td><code>height</code></td><td>assumed height in metres for untagged neighbours</td></tr>
         <tr><td><code>name</code></td><td>label echoed into the report link</td></tr>
         <tr><td><code>year</code></td><td>reference year, default current</td></tr>
-        <tr><td><code>key</code></td><td>API key, or send <code>Authorization: Bearer</code></td></tr>
+        <tr><td><code>key</code></td><td>secret key <code>ts_sk_…</code>; better: send <code>Authorization: Bearer</code> from your server</td></tr>
+        <tr><td><code>pk</code></td><td>publishable key <code>ts_pk_…</code> for badges and report links, safe in public pages</td></tr>
       </tbody></table>
-      <h3>Errors</h3><p class="small">400 bad coordinates · 401 missing key · 403 invalid key · 503 calculating: a new location's building data is still arriving; the calculation finishes in the background, retry after <code>retry_after_s</code> (usually 20 s). The badge and the report never wait for this: they compute in the visitor's browser if needed.</p></div>
+      <h3>Keys and limits</h3><p class="small">No key: 100 calls a month per caller. Agent 1,000, Agency 3,000 a month. Portal API: 25,000 included, then €0.02 a call, safety cap 250,000. Every answer carries <code>X-RateLimit-Limit</code> and <code>X-RateLimit-Remaining</code>. Calls that return 503 are not counted.</p>
+      <h3>Errors</h3><p class="small">400 bad coordinates · 402 subscription not active · 403 unknown key · 429 monthly allowance used, see <code>resets_at</code> · 503 calculating: a new location's building data is still arriving; the calculation finishes in the background, retry after <code>retry_after_s</code> (usually 20 s). The badge and the report never wait for this: they compute in the visitor's browser if needed.</p></div>
       <div><h3>Response (trimmed)</h3><pre><code>{
   "sun_score": 76, "grade": "A",
   "annual_avg_direct_sun_hours": 8.9,
@@ -139,8 +144,9 @@ Authorization: Bearer YOUR_KEY</code></pre></div>
   </section>
 
   <section id="signup" class="card signup">
-    <h2>Get your key</h2>
-    <p class="muted">Keys are sent by email within one business day, with the payment link for paid plans. No card needed for Free.</p>
+    <h2>Bulk, custom plans and questions</h2>
+    <p class="muted">Paid plans need no form: pick a plan above and your keys appear on your account page as soon as you pay. Free needs no sign-up at all. Write to us for bulk CSV scoring, custom scoring, your own report subdomain, volume above 250,000 calls a month, or anything else.</p>
+    <p class="note" id="soonMsg" role="status" hidden></p>
     <form name="api-key-request" method="POST" data-netlify="true" netlify-honeypot="company-website" action="/listings/?sent=1#signup">
       <input type="hidden" name="form-name" value="api-key-request">
       <p class="hidden-field"><label>Leave empty <input name="company-website"></label></p>
@@ -153,8 +159,8 @@ Authorization: Bearer YOUR_KEY</code></pre></div>
         <div class="field"><label for="f-vol">Listings a month</label><input id="f-vol" name="listings_per_month" type="number" min="0" placeholder="e.g. 40"></div>
       </div>
       <div class="field"><label for="f-msg">Anything else</label><textarea id="f-msg" name="message" rows="3" placeholder="Portal name, CRM, or the first address you want to test"></textarea></div>
-      <button type="submit" class="btn">Request key</button>
-      <p class="small muted" id="sentMsg" hidden>Thanks. Your key is on its way.</p>
+      <button type="submit" class="btn">Send</button>
+      <p class="small muted" id="sentMsg" hidden>Thanks. We will reply within one business day.</p>
     </form>
   </section>
 
@@ -164,10 +170,11 @@ Authorization: Bearer YOUR_KEY</code></pre></div>
     <details><summary>Where does the data come from?</summary><p>Building footprints and heights from OpenStreetMap within 250 m, a solar position model accurate to a few minutes, and 2.5D shadow casting every 10 minutes from sunrise to sunset. Trees, awnings and terrain are not included, and the report says so.</p></details>
     <details><summary>What if OpenStreetMap has no height for the building?</summary><p>The report says which figures are estimated. You set the floor count with <code>floors</code>, which fixes the building itself. Neighbours use a typical local height unless you pass <code>height</code>.</p></details>
     <details><summary>Is this legally safe to publish?</summary><p>It is a calculated estimate from open data with the method and limits printed on the report, not a survey. Keep the disclaimer and let buyers re-run the link. That is more than any "luminoso" claim can offer.</p></details>
+    <details><summary>How does billing work?</summary><p>Card payment through Stripe, monthly or yearly (two months free). Cancel or switch plans any time from your account page; the plan runs to the end of the period you paid for. On Portal API, 25,000 calls a month are included and further calls are €0.02 each on the next invoice. Prices exclude VAT.</p></details>
     <details><summary>Which countries?</summary><p>Anywhere OpenStreetMap has buildings, which is most European and North American cities. Coverage of heights varies; Italy, Germany, France, Spain and the UK are good in city centres.</p></details>
   </section>
 </main>
-<footer class="wrap foot muted"><p>Terrace Sun · <a href="/">Check any spot</a> · <a href="/blog/">Blog</a> · <a href="/blog/sun-exposure-property-listings/">Guide: sun exposure in listings</a> · <a href="/rome-sunny-cafes/">Sunniest cafés in Rome</a> · Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL)</p></footer>
+<footer class="wrap foot muted"><p>Terrace Sun · <a href="/">Check any spot</a> · <a href="/blog/">Blog</a> · <a href="/blog/sun-exposure-property-listings/">Guide: sun exposure in listings</a> · <a href="/rome-sunny-cafes/">Sunniest cafés in Rome</a> · Map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap contributors</a> (ODbL) · <a href="/account/">Account</a> · <a href="/terms/">Terms and privacy</a></p></footer>
 <script src="/listings.js"></script>
 </body>
 </html>

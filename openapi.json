@@ -3,7 +3,7 @@
  "info": {
   "title": "Terrace Sun sun exposure API",
   "version": "1.0.0",
-  "description": "Hours of direct sun on each street-facing wall of a building at a given floor, per season and month, with a 0-100 Sun Score (grades A to E). Computed from OpenStreetMap building footprints and heights within 250 m. Direct-beam sun, clear sky, flat ground; trees and awnings are not modelled.",
+  "description": "Hours of direct sun on each street-facing wall of a building at a given floor, per season and month, with a 0-100 Sun Score (grades A to E). Computed from OpenStreetMap building footprints and heights within 250 m. Direct-beam sun, clear sky, flat ground; trees and awnings are not modelled. Plans and keys: https://terrace-sun.netlify.app/listings/#pricing (free allowance 100 calls a month without a key; Agent 1,000; Agency 3,000; Portal API 25,000 included then EUR 0.02 per call). Responses carry X-RateLimit-Limit and X-RateLimit-Remaining.",
   "contact": {
    "url": "https://terrace-sun.netlify.app/listings/#signup"
   },
@@ -103,7 +103,16 @@
       "schema": {
        "type": "string"
       },
-      "description": "API key; alternatively send Authorization: Bearer. The key 'demo' works for testing."
+      "description": "Secret key (ts_sk_...). Prefer the Authorization: Bearer header from your server. Omit for the free allowance (100 calls a month per caller); 'demo' also uses the free allowance."
+     },
+     {
+      "name": "pk",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "string"
+      },
+      "description": "Publishable key (ts_pk_...) for badges and report links. Safe in public pages; not metered; 2,000 calls a day per account."
      }
     ],
     "security": [
@@ -133,8 +142,8 @@
        }
       }
      },
-     "401": {
-      "description": "Missing key (only when keys are enforced)",
+     "402": {
+      "description": "Subscription not active (cancelled, unpaid or incomplete). Update billing at https://terrace-sun.netlify.app/account/",
       "content": {
        "application/json": {
         "schema": {
@@ -144,7 +153,17 @@
       }
      },
      "403": {
-      "description": "Invalid key",
+      "description": "Unknown or rotated key",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Error"
+        }
+       }
+      }
+     },
+     "429": {
+      "description": "Monthly allowance used: free 100 per caller, Agent 1,000, Agency 3,000, Portal API safety cap 250,000. Body has used, limit and resets_at.",
       "content": {
        "application/json": {
         "schema": {
@@ -171,7 +190,8 @@
   "securitySchemes": {
    "bearer": {
     "type": "http",
-    "scheme": "bearer"
+    "scheme": "bearer",
+    "description": "Secret key ts_sk_... from https://terrace-sun.netlify.app/account/ (keep it server side)."
    }
   },
   "schemas": {

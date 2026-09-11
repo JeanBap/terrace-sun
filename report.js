@@ -12,8 +12,29 @@
   const status = (m, err) => { const el = $('status'); el.textContent = m || ''; el.classList.toggle('err', !!err); el.hidden = !m; };
   $('printBtn').onclick = () => { if (window.tsTrack) window.tsTrack('report_print', agency || ''); window.print(); };
   $('genDate').textContent = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
-  if (agency) { $('brandName').textContent = agency; document.title = `Sun Exposure Report: ${name} | ${agency}`; }
-  if (logo && /^https:\/\//.test(logo)) { const img = document.createElement('img'); img.src = logo; img.alt = agency || 'logo'; img.onerror = () => img.remove(); $('brand').insertBefore(img, $('brandName')); $('brand').querySelector('.sun').remove(); }
+  // Agency branding needs a paid plan (publishable key pk) or a paid single report (t); otherwise the report carries ours.
+  const pk = P.get('pk'), tok = P.get('t');
+  function applyBrand(b) {
+    if (b && b.branded) {
+      const ag = b.agency || agency, lg = b.logo || logo, at = b.agent || agent;
+      document.body.classList.add('branded');
+      if (ag) { $('brandName').textContent = ag; document.title = `Sun Exposure Report: ${name} | ${ag}`; }
+      if (lg && /^https:\/\//.test(lg)) { const img = document.createElement('img'); img.src = lg; img.alt = ag || 'logo'; img.onerror = () => img.remove(); $('brand').insertBefore(img, $('brandName')); const sun = $('brand').querySelector('.sun'); if (sun) sun.remove(); }
+      if (at) { $('agentLine').textContent = at; $('agentLine').hidden = false; }
+      $('powered').hidden = true;
+      if (b.sample || b.test) { const r = document.createElement('span'); r.className = 'samplebadge'; r.textContent = b.sample ? 'Sample report' : 'Test mode'; $('brand').appendChild(r); }
+      return;
+    }
+    if (!(Math.abs(lat) <= 90 && Math.abs(lon) <= 180)) return;
+    const f = $('buyForm');
+    for (const k of ['lat', 'lon', 'floor', 'floors', 'h', 'name']) if (P.get(k)) { const i = document.createElement('input'); i.type = 'hidden'; i.name = k; i.value = P.get(k); f.appendChild(i); }
+    for (const k of ['agency', 'logo', 'agent']) if (P.get(k)) f.elements[k].value = P.get(k);
+    const note = { cancelled: 'Checkout cancelled. No payment was taken.', error: 'Checkout could not start. Please try again in a minute.', soon: 'Online payment is being switched on. Please try again later.' }[P.get('checkout')];
+    if (note) { $('upsellNote').textContent = note; $('upsellNote').hidden = false; }
+    $('upsell').hidden = false;
+  }
+  if (pk || tok) fetch('/api/brand?' + new URLSearchParams({ pk: pk || '', t: tok || '', lat: P.get('lat') || '', lon: P.get('lon') || '' })).then(r => r.json()).catch(() => ({ branded: true, unverified: true })).then(applyBrand);
+  else applyBrand({ branded: false });
 
   if (!(Math.abs(lat) <= 90 && Math.abs(lon) <= 180)) { status('This report link is missing coordinates. Open it from your listing tool or add ?lat=..&lon=.. to the address.', true); return; }
 
@@ -54,7 +75,7 @@
   function render(model, rep, tz) {
     const fl = rep.floor;
     $('propName').textContent = name;
-    $('propMeta').textContent = `${rep.point_mode ? 'Open spot' : floorName(fl) + ' of ' + rep.floors_in_building} · ${lat.toFixed(5)}, ${lon.toFixed(5)} · times in ${tz}${agent ? ' · ' + agent : ''}`;
+    $('propMeta').textContent = `${rep.point_mode ? 'Open spot' : floorName(fl) + ' of ' + rep.floors_in_building} · ${lat.toFixed(5)}, ${lon.toFixed(5)} · times in ${tz}`;
     $('gradeLetter').textContent = rep.grade; $('gradeLetter').className = 'gradeLetter g-' + rep.grade; $('scoreNum').textContent = rep.score;
     const bestI = rep.seasons[0].best_wall, bestF = rep.facades[bestI];
     const sideTxt = rep.point_mode ? 'at this spot' : `on the ${DIRS[bestF.faces]}-facing side${bestF.street ? ' (' + esc(bestF.street) + ')' : ''}`;

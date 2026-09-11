@@ -1,5 +1,5 @@
 .brandlink{display:flex;align-items:center;gap:.5rem;font-weight:800;font-size:1.3rem;color:var(--ink);text-decoration:none}
-.topnav{display:flex;gap:16px;font-weight:600;font-size:.95rem}
+.topnav{display:flex;flex-wrap:wrap;gap:4px 16px;font-weight:600;font-size:.95rem}
 .eyebrow{text-transform:uppercase;letter-spacing:.06em;font-size:.75rem;color:var(--accent);font-weight:700;margin:0 0 6px}
 .herosales{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center;padding-block:18px 10px}
 .herosales h1{font-size:2.1rem;line-height:1.15;margin:0 0 10px;letter-spacing:-.01em}
@@ -48,3 +48,24 @@ textarea{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radi
 .hidden-field{position:absolute;left:-9999px}
 code{background:var(--sunsoft);padding:1px 5px;border-radius:4px;font-size:.9em;overflow-wrap:anywhere}
 pre code{background:none;padding:0}
+.billtoggle{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;margin:4px 0 14px;background:var(--card)}
+.billtoggle button{border:0;background:transparent;font:inherit;font-weight:600;padding:6px 14px;border-radius:999px;cursor:pointer;color:var(--ink);min-height:36px}
+.billtoggle button.on{background:var(--ink);color:var(--bg)}
+.billtoggle span{font-size:.75rem;font-weight:700;color:#2e7d32;margin-left:4px}
+.billtoggle button.on span{color:#a5d6a7}
+.plan form{margin:0}.plan form .btn{width:100%}
+.note{background:var(--sunsoft);border:1px solid var(--line);border-radius:8px;padding:8px 12px;color:var(--ink)}
+.acct{max-width:920px;padding-block:6px 30px}
+.acct h1{margin:16px 0 6px}
+.acct .card{margin-bottom:14px;min-width:0}
+.acct h2{font-size:1.1rem;margin:0 0 6px}
+.big{font-size:1.6rem;font-weight:800;margin:2px 0}
+.meterbar{height:12px;border-radius:6px;background:var(--sunsoft);overflow:hidden;margin:8px 0}
+.meterbar i{display:block;height:100%;width:0;background:var(--accent)}
+.copyrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.copyrow code{font-size:.95rem;padding:6px 8px;word-break:break-all}
+.keybox{border-color:var(--accent)!important;box-shadow:0 8px 30px rgba(194,86,43,.12)}
+.acct .err,.acct .status.err{color:#b3261e}
+.acct input[type=password],.acct input[type=text]{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);width:100%;max-width:520px}
+.minibtn{font:inherit;font-size:.85rem;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--accent);border-radius:6px;padding:4px 10px;cursor:pointer;min-height:32px}
+.legal{max-width:760px;padding-block:6px 30px}.legal h2{font-size:1.2rem;margin:22px 0 6px}
