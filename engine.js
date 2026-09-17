@@ -346,6 +346,45 @@
     };
   }
 
-  const api = { M_PER_LEVEL, offsetMin, dayWindow, hhmm, grade, propertyReport, sunPosition, parseOSM, applyHeights, findFacades, analyse, shadowShapes, projector, compass, inside, RAD };
+
+  // OpenStreetMap main API (api.openstreetmap.org/api/0.6/map.json) reshaped into what Overpass "out geom" returns,
+  // so the same parser works when the Overpass mirrors are busy or block the caller.
+  const POI_AMENITY = /^(cafe|bar|restaurant|pub|ice_cream)$/;
+  const isPoi = t => !!(t && t.name && (POI_AMENITY.test(t.amenity || '') || t.shop === 'bakery'));
+  function boundsOf(g) {
+    let a = 90, b = -90, c = 180, d = -180;
+    for (const p of g) { if (p.lat < a) a = p.lat; if (p.lat > b) b = p.lat; if (p.lon < c) c = p.lon; if (p.lon > d) d = p.lon; }
+    return { minlat: a, maxlat: b, minlon: c, maxlon: d };
+  }
+  function fromOsmApi(json) {
+    const els = (json && json.elements) || [], nodes = new Map(), wayGeom = new Map(), out = [];
+    for (const e of els) if (e.type === 'node') nodes.set(e.id, e);
+    for (const e of els) {
+      if (e.type === 'node') { if (isPoi(e.tags)) out.push({ type: 'node', id: e.id, lat: e.lat, lon: e.lon, tags: e.tags }); continue; }
+      if (e.type !== 'way') continue;
+      const g = [];
+      for (const id of e.nodes || []) { const n = nodes.get(id); if (n) g.push({ lat: n.lat, lon: n.lon }); }
+      if (!g.length) continue;
+      wayGeom.set(e.id, g);
+      const t = e.tags || {};
+      if (t.building || t['building:part'] || (t.highway && t.name) || isPoi(t)) out.push({ type: 'way', id: e.id, tags: t, geometry: g, bounds: boundsOf(g) });
+    }
+    for (const e of els) {
+      if (e.type !== 'relation') continue;
+      const t = e.tags || {};
+      if (!(t.building || t['building:part'] || isPoi(t))) continue;
+      const members = [], all = [];
+      for (const m of e.members || []) {
+        const g = m.type === 'way' ? wayGeom.get(m.ref) : null;
+        if (!g) continue;
+        members.push({ type: 'way', ref: m.ref, role: m.role, geometry: g });
+        for (const p of g) all.push(p);
+      }
+      if (members.length) out.push({ type: 'relation', id: e.id, tags: t, members, bounds: boundsOf(all) });
+    }
+    return { elements: out, source: 'osm-api' };
+  }
+
+  const api = { fromOsmApi, M_PER_LEVEL, offsetMin, dayWindow, hhmm, grade, propertyReport, sunPosition, parseOSM, applyHeights, findFacades, analyse, shadowShapes, projector, compass, inside, RAD };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.SunEngine = api;
 })(typeof self !== 'undefined' ? self : this);

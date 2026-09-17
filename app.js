@@ -61,17 +61,31 @@
   async function overpass(lat, lon) {
     const a = `(around:${RADIUS},${lat.toFixed(6)},${lon.toFixed(6)})`;
     const q = `[out:json][timeout:25];(way["building"]${a};relation["building"]${a};way["building:part"]${a};way["highway"]["name"](around:90,${lat.toFixed(6)},${lon.toFixed(6)});nwr["amenity"~"^(cafe|bar|restaurant|pub|ice_cream)$"]${a};nwr["shop"="bakery"]${a};);out geom;`;
-    let last;
-    for (const url of OVERPASS) {
-      try {
-        const r = await fetchT(url, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }, 30000);
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        const j = await r.json();
-        if (!j.elements) throw new Error('bad reply');
-        return j;
-      } catch (e) { last = e; }
-    }
-    throw new Error('Building data servers are busy (' + (last && last.message) + '). Please try again in a minute.');
+    // 1) our own cache: instant for a spot someone has already checked
+    try {
+      const r = await fetchT(`/api/v1/osm?lat=${lat.toFixed(6)}&lon=${lon.toFixed(6)}`, {}, 14000);
+      if (r.ok) { const j = await r.json(); if (j.elements && j.elements.length) return j; }
+    } catch (e) { }
+    status('Map servers are slow today. Trying a few at once…');
+    // 2) every Overpass mirror at once, first good answer wins
+    const tries = OVERPASS.map(async url => {
+      const r = await fetchT(url, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }, 20000);
+      if (!r.ok) throw new Error(url.split('/')[2] + ' HTTP ' + r.status);
+      const j = await r.json();
+      if (!j.elements) throw new Error(url.split('/')[2] + ' bad reply');
+      return j;
+    });
+    try { return await Promise.any(tries); } catch (e) { }
+    // 3) OpenStreetMap's own map API
+    try { return await osmApi(lat, lon); }
+    catch (e) { throw new Error('Building data servers are busy. Please try again in a minute.'); }
+  }
+  async function osmApi(lat, lon) {
+    const dLat = RADIUS / 111320, dLon = dLat / Math.max(0.2, Math.cos(lat * RAD));
+    const bbox = [lon - dLon, lat - dLat, lon + dLon, lat + dLat].map(v => v.toFixed(6)).join(',');
+    const r = await fetchT('https://api.openstreetmap.org/api/0.6/map.json?bbox=' + bbox, {}, 25000);
+    if (!r.ok) throw new Error('OpenStreetMap HTTP ' + r.status);
+    return E.fromOsmApi(await r.json());
   }
 
   // ---------- input parsing ----------

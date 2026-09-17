@@ -31,17 +31,18 @@
       var E = window.SunEngine, a250 = '(around:250,' + lat.toFixed(6) + ',' + lon.toFixed(6) + ')';
       var qq = '[out:json][timeout:25];(way["building"]' + a250 + ';relation["building"]' + a250 + ';way["building:part"]' + a250 + ';way["highway"]["name"](around:90,' + lat.toFixed(6) + ',' + lon.toFixed(6) + '););out geom;';
       var mirrors = ['https://overpass-api.de/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
-      var i = 0;
-      (function next() {
-        if (i >= mirrors.length) return fail();
-        var ac = new AbortController(), tm = setTimeout(function () { ac.abort(); }, 30000);
-        fetch(mirrors[i++], { method: 'POST', body: 'data=' + encodeURIComponent(qq), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, signal: ac.signal }).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) {
-          clearTimeout(tm);
-          var model = E.parseOSM(j, lat, lon), tz = window.tzlookup ? tzlookup(lat, lon) : 'UTC';
-          var rep = E.propertyReport(model, lat, lon, tz, { floor: floor, floors: floors, stepMin: 15 });
-          var r = { grade: rep.grade, score: rep.score, hours: rep.annual_avg_hours, t: Date.now() }; show(r); try { localStorage.setItem(ck, JSON.stringify(r)); } catch (e) { }
-        }).catch(function () { clearTimeout(tm); next(); });
-      })();
+      var timed = function (p, ms) { return Promise.race([p, new Promise(function (_, rej) { setTimeout(function () { rej(new Error('timed out')); }, ms); })]); };
+      var ask = function (url, opts, ms) { return timed(fetch(url, opts), ms).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) { if (!j.elements || !j.elements.length) throw new Error('empty'); return j; }); };
+      var post = { method: 'POST', body: 'data=' + encodeURIComponent(qq), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } };
+      var done = function (j) {
+        var model = E.parseOSM(j, lat, lon), tz = window.tzlookup ? tzlookup(lat, lon) : 'UTC';
+        var rep = E.propertyReport(model, lat, lon, tz, { floor: floor, floors: floors, stepMin: 15 });
+        var r = { grade: rep.grade, score: rep.score, hours: rep.annual_avg_hours, t: Date.now() };
+        show(r); try { localStorage.setItem(ck, JSON.stringify(r)); } catch (e) { }
+      };
+      ask(base + '/api/v1/osm?lat=' + lat.toFixed(6) + '&lon=' + lon.toFixed(6), {}, 14000)
+        .catch(function () { return Promise.any(mirrors.map(function (m) { return ask(m, post, 20000); })); })
+        .then(done).catch(fail);
     }).catch(fail);
   });
 })();

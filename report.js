@@ -41,17 +41,29 @@
   async function overpass() {
     const a = `(around:250,${lat.toFixed(6)},${lon.toFixed(6)})`;
     const q = `[out:json][timeout:25];(way["building"]${a};relation["building"]${a};way["building:part"]${a};way["highway"]["name"](around:90,${lat.toFixed(6)},${lon.toFixed(6)}););out geom;`;
-    let last;
-    for (const url of OVERPASS) {
-      try {
-        const ac = new AbortController(); const t = setTimeout(() => ac.abort(), 30000);
-        const r = await fetch(url, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, signal: ac.signal }).finally(() => clearTimeout(t));
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        const j = await r.json(); if (!j.elements) throw new Error('bad reply'); return j;
-      } catch (e) { last = e; }
-    }
-    throw new Error('Building data servers are busy (' + (last && last.message) + '). Reload in a minute.');
+    try {
+      const r = await withTimeout(fetch(`/api/v1/osm?lat=${lat.toFixed(6)}&lon=${lon.toFixed(6)}`), 14000);
+      if (r.ok) { const j = await r.json(); if (j.elements && j.elements.length) return j; }
+    } catch (e) { }
+    status('Map servers are slow today. Trying a few at once…');
+    const tries = OVERPASS.map(async url => {
+      const r = await withTimeout(fetch(url, { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }), 20000);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const j = await r.json();
+      if (!j.elements) throw new Error('bad reply');
+      return j;
+    });
+    try { return await Promise.any(tries); } catch (e) { }
+    const dLat = 250 / 111320, dLon = dLat / Math.max(0.2, Math.cos(lat * RAD));
+    const bbox = [lon - dLon, lat - dLat, lon + dLon, lat + dLat].map(v => v.toFixed(6)).join(',');
+    const r2 = await withTimeout(fetch('https://api.openstreetmap.org/api/0.6/map.json?bbox=' + bbox), 25000);
+    if (!r2.ok) throw new Error('Building data servers are busy. Please try again in a minute.');
+    return E.fromOsmApi(await r2.json());
   }
+  function withTimeout(p, ms) {
+    return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timed out')), ms))]);
+  }
+
 
   const bars = (rows, selIdx) => `<div class="bars">${rows.map((r, i) => `<span class="${i === selIdx ? 'sel' : ''}">${esc(r[0])}</span><span class="bar ${i === selIdx ? 'sel' : ''}"><i style="width:${r[2] ? Math.min(100, r[1] / r[2] * 100) : 0}%"></i></span><span class="${i === selIdx ? 'sel' : ''}">${r[1].toFixed(1)} h</span>`).join('')}</div>`;
   const timesText = t => t.length ? t.map(x => x[0] + ' to ' + x[1]).join(', ') : 'no direct sun';
