@@ -28,6 +28,10 @@ Direct sun only, clear sky, flat ground, no trees or awnings. Untagged building 
 ## Licence
 MIT. Map data © OpenStreetMap contributors (ODbL).
 
+## Building data
+
+Two sources, raced: the public Overpass mirrors (they answer 406 to cloud hosts, so they often lose) and the OpenStreetMap map API (`api.openstreetmap.org/api/0.6/map.json`, reshaped by `SunEngine.fromOsmApi` into the same shape Overpass `out geom` returns). Answers are cached 30 days in Blobs under `o2/lat/lon` and served to the browser by `/api/v1/osm` (CDN cached, includes cafés and shops for the map). Pages ask that endpoint first, then every Overpass mirror at once, then OpenStreetMap directly.
+
 ## Billing (Stripe)
 
 - Plans: Agent €19/month or €190/year (1,000 API calls a month), Agency €79 or €790 (3,000), Portal API €390/month plus €0.02 per call above 25,000 (Stripe Billing Meter `terrace_sun_api_call`, safety cap 250,000), single branded report €9.

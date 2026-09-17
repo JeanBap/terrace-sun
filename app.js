@@ -61,11 +61,17 @@
   async function overpass(lat, lon) {
     const a = `(around:${RADIUS},${lat.toFixed(6)},${lon.toFixed(6)})`;
     const q = `[out:json][timeout:25];(way["building"]${a};relation["building"]${a};way["building:part"]${a};way["highway"]["name"](around:90,${lat.toFixed(6)},${lon.toFixed(6)});nwr["amenity"~"^(cafe|bar|restaurant|pub|ice_cream)$"]${a};nwr["shop"="bakery"]${a};);out geom;`;
-    // 1) our own cache: instant for a spot someone has already checked
-    try {
-      const r = await fetchT(`/api/v1/osm?lat=${lat.toFixed(6)}&lon=${lon.toFixed(6)}`, {}, 14000);
-      if (r.ok) { const j = await r.json(); if (j.elements && j.elements.length) return j; }
-    } catch (e) { }
+    // 1) our own cache: instant for a spot someone has already checked, one retry while the worker fetches a new one
+    for (const wait of [0, 4000, 6000]) {
+      if (wait) { status('Fetching the buildings around this spot…'); await new Promise(r => setTimeout(r, wait)); }
+      let again = false;
+      try {
+        const r = await fetchT(`/api/v1/osm?lat=${lat.toFixed(6)}&lon=${lon.toFixed(6)}`, {}, 14000);
+        if (r.ok) { const j = await r.json(); if (j.elements && j.elements.length) return j; }
+        again = r.status === 503;
+      } catch (e) { }
+      if (!again) break;
+    }
     status('Map servers are slow today. Trying a few at once…');
     // 2) every Overpass mirror at once, first good answer wins
     const tries = OVERPASS.map(async url => {
