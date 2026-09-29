@@ -103,7 +103,7 @@
       "schema": {
        "type": "string"
       },
-      "description": "Secret key (ts_sk_...). Prefer the Authorization: Bearer header from your server. Omit for the free allowance (100 calls a month per caller); 'demo' also uses the free allowance."
+      "description": "Rejected. Secret keys (ts_sk_...) must be sent as Authorization: Bearer and are refused in the query string. Omit any key for the free allowance (100 calls a month per caller). Publishable keys use the pk parameter."
      },
      {
       "name": "pk",

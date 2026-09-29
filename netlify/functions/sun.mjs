@@ -20,8 +20,13 @@ export default async (req, context) => {
   let plan = 'free', counter = null, limit = 0, shown = 0, used = 0, acct = null, metered = false;
   const log = (st, src) => record('api', { st, plan, src, h: callerHost, g: context.geo?.country?.code || '' }, 700);
   const deny = async (code, body) => { await log(code); return reply(code, body, NOSTORE); };
-  const key = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim() || p.key || '';
-  const pk = url.searchParams.get('pk') || (key.startsWith('ts_pk_') ? key : '');
+  const bearer = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '').trim();
+  const queryKey = (url.searchParams.get('key') || '').trim();
+  if (queryKey.startsWith('ts_sk_')) {
+    return deny(403, { error: 'secret_in_query', message: 'Secret keys must be sent as Authorization: Bearer ts_sk_.... They are rejected in the query string.' });
+  }
+  const key = bearer;
+  const pk = url.searchParams.get('pk') || (bearer.startsWith('ts_pk_') ? bearer : '');
   const manual = env('TS_API_KEYS').split(',').map(s => s.trim()).filter(Boolean);
 
   try {
@@ -63,8 +68,8 @@ export default async (req, context) => {
       if (used >= limit) return deny(429, { error: 'free_limit', used, limit, resets_at: nextMonth(), message: `The free allowance is ${FREE_MONTHLY} calls a month per caller. Plans with keys: ${PRIMARY}/listings/#pricing` });
     }
   } catch (e) {
-    console.log('billing check failed, serving without counting', e.message);
-    counter = null; metered = false;
+    console.log('billing check failed', e.message);
+    return deny(503, { error: 'billing_unavailable', message: 'Billing could not be verified. Try again shortly.' });
   }
   if (!p.ok) return deny(400, { error: 'bad_coordinates', message: 'lat and lon are required, decimal degrees.' });
 

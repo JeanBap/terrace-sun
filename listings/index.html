@@ -114,11 +114,11 @@ Authorization: Bearer YOUR_SECRET_KEY</code></pre></div>
         <tr><td><code>height</code></td><td>assumed height in metres for untagged neighbours</td></tr>
         <tr><td><code>name</code></td><td>label echoed into the report link</td></tr>
         <tr><td><code>year</code></td><td>reference year, default current</td></tr>
-        <tr><td><code>key</code></td><td>secret key <code>ts_sk_…</code>; better: send <code>Authorization: Bearer</code> from your server</td></tr>
+        <tr><td><code>Authorization</code></td><td>secret key <code>ts_sk_…</code>, header only: <code>Authorization: Bearer</code> from your server. A <code>ts_sk_</code> value in the query string is rejected.</td></tr>
         <tr><td><code>pk</code></td><td>publishable key <code>ts_pk_…</code> for badges and report links, safe in public pages</td></tr>
       </tbody></table>
       <h3>Keys and limits</h3><p class="small">No key: 100 calls a month per caller. Agent 1,000, Agency 3,000 a month. Portal API: 25,000 included, then €0.02 a call, safety cap 250,000. Every answer carries <code>X-RateLimit-Limit</code> and <code>X-RateLimit-Remaining</code>. Calls that return 503 are not counted.</p>
-      <h3>Errors</h3><p class="small">400 bad coordinates · 402 subscription not active · 403 unknown key · 429 monthly allowance used, see <code>resets_at</code> · 503 calculating: a new location's building data is still arriving; the calculation finishes in the background, retry after <code>retry_after_s</code> (usually 20 s). The badge and the report never wait for this: they compute in the visitor's browser if needed.</p></div>
+      <h3>Errors</h3><p class="small">400 bad coordinates · 402 subscription not active · 403 unknown key, or a secret key was sent in the query string · 429 monthly allowance used, see <code>resets_at</code> · 503 calculating: a new location's building data is still arriving; the calculation finishes in the background, retry after <code>retry_after_s</code> (usually 20 s). 503 billing_unavailable: the plan check failed, and the call is not served. The badge and the report never wait for a 503 calculating response: they compute in the visitor's browser if needed.</p></div>
       <div><h3>Response (trimmed)</h3><pre><code>{
   "sun_score": 76, "grade": "A",
   "annual_avg_direct_sun_hours": 8.9,
