@@ -21,7 +21,7 @@ export default async req => {
         if (s.status !== 'complete') return out(409, { error: 'not_complete', message: 'Payment is not complete yet.' });
         rec = await provisionSession(s);
       }
-      if (Date.now() - rec.created > 30 * DAY) return out(401, { error: 'link_expired', message: 'This purchase link has expired. Sign in with your secret key.' });
+      if (Date.now() - rec.created > DAY) return out(401, { error: 'link_expired', message: 'This purchase link has expired. Sign in with your secret key.' });
       if (rec.kind === 'single') {
         const t = await bget(`single/${rec.token}`);
         if (!t?.paid) return out(200, { kind: 'single', paid: false });
