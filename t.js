@@ -1,4 +1,4 @@
-/* Terrace Sun: cookieless, first-party visit counts. No cookies, no IP stored. Respects Do Not Track and Global Privacy Control. */
+/* Terrace Sun: cookieless, first-party visit counts. No cookies and no visitor fingerprint. Respects Do Not Track and Global Privacy Control. */
 (function () {
   try {
     if (navigator.doNotTrack === '1' || navigator.globalPrivacyControl) { window.tsTrack = function () { }; return; }

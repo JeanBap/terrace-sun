@@ -1,5 +1,5 @@
-// Beacon endpoint for pageviews and events. Cookieless: no IP is stored, visitors are counted with a daily-rotating hash.
-import { record, botName, aiSource, searchSource, device, visitorHash } from '../../lib/analytics.mjs';
+// Beacon endpoint for pageviews and events. Cookieless: no IP address and no visitor fingerprint are stored.
+import { record, botName, aiSource, searchSource, device } from '../../lib/analytics.mjs';
 
 export default async (req, context) => {
   if (req.method !== 'POST') return new Response(null, { status: 405 });
@@ -15,8 +15,7 @@ export default async (req, context) => {
   const utm = [body.s, body.m, body.c].filter(Boolean).join(' / ');
   const k = body.k;
   if (k === 'pv') {
-    const v = await visitorHash(context.ip || '', ua, Netlify.env.get('STATS_KEY') || 'ts');
-    await record(bot ? 'bot' : 'pv', { p: body.p, r: refHost, ai: aiSource(refHost, body.s), se: searchSource(refHost), s: body.s, m: body.m, c: body.c, g: country, d: device(ua), b: bot, v: bot ? '' : v });
+    await record(bot ? 'bot' : 'pv', { p: body.p, r: refHost, ai: aiSource(refHost, body.s), se: searchSource(refHost), s: body.s, m: body.m, c: body.c, g: country, d: device(ua), b: bot });
   } else if (k === 'ev') {
     if (!bot) await record('ev', { n: body.n, x: body.x, p: body.p, g: country });
   } else if (k === 'badge') {
