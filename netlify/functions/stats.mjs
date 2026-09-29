@@ -1,14 +1,18 @@
-// Private stats: GET /api/stats?days=30 with header x-stats-key (or ?key=).
+// Private stats: GET /api/stats?days=30 with header x-stats-key.
 import { readDay } from '../../lib/analytics.mjs';
+import { timingSafeEqual } from 'node:crypto';
 
 const top = (m, n = 20) => [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
 const inc = (m, k, by = 1) => { if (k) m.set(k, (m.get(k) || 0) + by); };
 
 export default async (req) => {
   const url = new URL(req.url);
-  const key = req.headers.get('x-stats-key') || url.searchParams.get('key') || '';
+  const key = req.headers.get('x-stats-key') || '';
   const want = Netlify.env.get('STATS_KEY');
-  if (!want || key !== want) return Response.json({ error: 'unauthorised' }, { status: 401 });
+  const supplied = Buffer.from(key), expected = Buffer.from(want || '');
+  if (!want || supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) {
+    return Response.json({ error: 'unauthorised' }, { status: 401 });
+  }
   const days = Math.min(90, Math.max(1, parseInt(url.searchParams.get('days') || '30', 10) || 30));
   const list = [];
   for (let i = days - 1; i >= 0; i--) list.push(new Date(Date.now() - i * 864e5).toISOString().slice(0, 10));

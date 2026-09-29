@@ -3,10 +3,8 @@
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmt = n => Number(n).toLocaleString('en-GB');
-  try { $('key').value = localStorage.getItem('ts_stats_key') || ''; } catch (e) { }
   $('auth').addEventListener('submit', e => { e.preventDefault(); load(); });
   $('days').addEventListener('change', () => { if ($('key').value) load(); });
-  if ($('key').value) load();
 
   async function load() {
     const key = $('key').value.trim(); if (!key) return;
@@ -15,7 +13,6 @@
       const r = await fetch('/api/stats?days=' + $('days').value, { headers: { 'x-stats-key': key } });
       if (r.status === 401) { $('msg').textContent = 'Wrong key.'; return; }
       const d = await r.json();
-      try { localStorage.setItem('ts_stats_key', key); } catch (e) { }
       $('msg').textContent = ''; render(d);
     } catch (e) { $('msg').textContent = 'Could not load stats: ' + e.message; }
   }
