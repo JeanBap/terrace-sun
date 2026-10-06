@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>People</title>
+<style>
+body{margin:0;font:16px/1.45 system-ui,sans-serif;background:#f4f1ea;color:#1c1915}
+main{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:28px;margin:0 0 6px}.sub{color:#5c564c;margin:0 0 18px}
+form{display:flex;gap:8px;max-width:420px}input,button{font:inherit;padding:10px 12px;border-radius:8px}
+input{flex:1;border:1px solid #cfc6b8}button{border:0;background:#1c1915;color:#fff;cursor:pointer}
+.err{color:#9f1239;min-height:1.2em}
+table{width:100%;border-collapse:collapse;background:#fff}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #eee;vertical-align:top}
+th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#6b645b}
+td.n{font-variant-numeric:tabular-nums;font-weight:650;font-size:18px}
+.today{display:block;font-weight:450;font-size:12px;color:#6b645b}
+.note{color:#6b645b;font-size:13px}
+.totals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 18px}
+.card{background:#fff;border-radius:12px;padding:14px}.card b{display:block;font-size:28px}.card span{color:#6b645b;font-size:13px}
+@media(max-width:700px){.totals{grid-template-columns:1fr}}
+</style></head><body><main>
+<h1>People</h1>
+<p class="sub">Visits, signups and logins. The small line under each number is today.</p>
+<form id="gate"><input id="pw" type="password" placeholder="Password" autocomplete="current-password" required><button>Open</button></form>
+<p class="err" id="err"></p>
+<div id="out" hidden><div class="totals" id="totals"></div>
+<table><thead><tr><th>Site</th><th>Visits</th><th>Signups</th><th>Logins</th><th></th></tr></thead><tbody id="rows"></tbody></table>
+</div></main>
+<script>
+const API="https://dciiqcoinlaradmjnkxv.supabase.co/functions/v1/site-people";
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjaWlxY29pbmxhcmFkbWpua3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTE1MjksImV4cCI6MjA4OTM2NzUyOX0.wT5Eg40gCnNzNKNfIZj7ge6eDxmXL2vFr-FAw6CTqVc";
+const err=document.getElementById("err"), out=document.getElementById("out");
+function cell(total,today){return '<td class="n">'+total+'<span class="today">today '+today+'</span></td>';}
+function render(sites){
+  const sum=sites.reduce((a,s)=>({visits:a.visits+s.visits,signups:a.signups+s.signups,logins:a.logins+s.logins,tv:a.tv+s.todayVisits,ts:a.ts+s.todaySignups,tl:a.tl+s.todayLogins}),{visits:0,signups:0,logins:0,tv:0,ts:0,tl:0});
+  document.getElementById("totals").innerHTML='<div class="card"><b>'+sum.visits+'</b><span>Visits, today '+sum.tv+'</span></div><div class="card"><b>'+sum.signups+'</b><span>Signups, today '+sum.ts+'</span></div><div class="card"><b>'+sum.logins+'</b><span>Logins, today '+sum.tl+'</span></div>';
+  document.getElementById("rows").innerHTML=sites.map(s=>'<tr><td>'+s.site+'</td>'+cell(s.visits,s.todayVisits)+cell(s.signups,s.todaySignups)+cell(s.logins,s.todayLogins)+'<td class="note">'+(s.note||'')+'</td></tr>').join("");
+  document.getElementById("gate").hidden=true; out.hidden=false;
+}
+async function openPanel(password){
+  err.textContent="";
+  const r=await fetch(API,{method:"POST",headers:{"content-type":"application/json",apikey:KEY,authorization:"Bearer "+KEY},body:JSON.stringify({action:"stats",password})});
+  if(!r.ok){err.textContent="Wrong password";return;}
+  const data=await r.json();
+  sessionStorage.setItem("people-ok",password);
+  render(data.sites||[]);
+}
+document.getElementById("gate").addEventListener("submit",e=>{e.preventDefault();openPanel(document.getElementById("pw").value);});
+const saved=sessionStorage.getItem("people-ok"); if(saved) openPanel(saved);
+</script></body></html>

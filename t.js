@@ -1,3 +1,5 @@
+(function(){try{var site='terrace-sun.netlify.app';if(sessionStorage.getItem('pv-'+site))return;sessionStorage.setItem('pv-'+site,'1');fetch('https://dciiqcoinlaradmjnkxv.supabase.co/functions/v1/site-people',{method:'POST',headers:{'content-type':'application/json',apikey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjaWlxY29pbmxhcmFkbWpua3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTE1MjksImV4cCI6MjA4OTM2NzUyOX0.wT5Eg40gCnNzNKNfIZj7ge6eDxmXL2vFr-FAw6CTqVc',authorization:'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjaWlxY29pbmxhcmFkbWpua3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTE1MjksImV4cCI6MjA4OTM2NzUyOX0.wT5Eg40gCnNzNKNfIZj7ge6eDxmXL2vFr-FAw6CTqVc'},body:JSON.stringify({action:'event',site:site,kind:'visit'})});}catch(e){}})();
+
 /* Terrace Sun: cookieless, first-party visit counts. No cookies and no visitor fingerprint. Respects Do Not Track and Global Privacy Control. */
 (function () {
   try {
