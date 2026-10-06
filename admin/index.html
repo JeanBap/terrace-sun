@@ -1,48 +1,127 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>People</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Performance</title>
 <style>
-body{margin:0;font:16px/1.45 system-ui,sans-serif;background:#f4f1ea;color:#1c1915}
-main{max-width:980px;margin:0 auto;padding:28px 18px 60px}
-h1{font-size:28px;margin:0 0 6px}.sub{color:#5c564c;margin:0 0 18px}
-form{display:flex;gap:8px;max-width:420px}input,button{font:inherit;padding:10px 12px;border-radius:8px}
+body{margin:0;font:15px/1.45 system-ui,sans-serif;background:#f4f1ea;color:#1c1915}
+main{max-width:1100px;margin:0 auto;padding:28px 18px 70px}
+h1{font-size:28px;margin:0 0 6px}.sub{color:#5c564c;margin:0 0 16px}
+form{display:flex;gap:8px;max-width:420px}[hidden]{display:none!important}
+input,button{font:inherit;padding:10px 12px;border-radius:8px}
 input{flex:1;border:1px solid #cfc6b8}button{border:0;background:#1c1915;color:#fff;cursor:pointer}
 .err{color:#9f1239;min-height:1.2em}
-table{width:100%;border-collapse:collapse;background:#fff}
-th,td{text-align:left;padding:10px 12px;border-bottom:1px solid #eee;vertical-align:top}
-th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:#6b645b}
-td.n{font-variant-numeric:tabular-nums;font-weight:650;font-size:18px}
-.today{display:block;font-weight:450;font-size:12px;color:#6b645b}
-.note{color:#6b645b;font-size:13px}
-.totals{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 18px}
-.card{background:#fff;border-radius:12px;padding:14px}.card b{display:block;font-size:28px}.card span{color:#6b645b;font-size:13px}
-@media(max-width:700px){.totals{grid-template-columns:1fr}}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:8px 0 16px}
+.card{background:#fff;border-radius:12px;padding:14px 14px 12px;border-top:4px solid #1c1915}
+.card b{display:block;font-size:26px;font-variant-numeric:tabular-nums}
+.card span{color:#6b645b;font-size:13px}
+.switch{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.switch button{background:#fff;color:#1c1915;border:1px solid #ddd}
+.switch button.on{background:#1c1915;color:#fff}
+.panel{background:#fff;border-radius:12px;padding:14px 14px 8px;margin:0 0 14px}
+.panel h2{font-size:15px;margin:0 0 10px}
+.bar-row{display:grid;grid-template-columns:180px 1fr 72px;gap:8px;align-items:center;margin:0 0 7px}
+.lab{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track{height:10px;background:#eee;border-radius:99px;overflow:hidden}
+.fill{display:block;height:100%;border-radius:99px}
+.val{text-align:right;font-variant-numeric:tabular-nums;font-size:13px}
+svg{width:100%;height:200px;display:block}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;overflow:hidden}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #eee;vertical-align:top;font-size:13px}
+th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#6b645b}
+td.n{font-variant-numeric:tabular-nums;font-weight:650}
+.today{display:block;font-weight:450;font-size:11px;color:#6b645b}
+.note{color:#6b645b}
+.foot{color:#6b645b;font-size:13px;margin:14px 0 0}
+@media(max-width:800px){.cards{grid-template-columns:1fr 1fr}.bar-row{grid-template-columns:1fr}.cards{grid-template-columns:1fr}}
 </style></head><body><main>
-<h1>People</h1>
-<p class="sub">Visits, signups and logins. The small line under each number is today.</p>
+<h1>Performance</h1>
+<p class="sub">Visits, clicks, logins, signups and payments across the sites. The small line is today.</p>
 <form id="gate"><input id="pw" type="password" placeholder="Password" autocomplete="current-password" required><button>Open</button></form>
 <p class="err" id="err"></p>
-<div id="out" hidden><div class="totals" id="totals"></div>
-<table><thead><tr><th>Site</th><th>Visits</th><th>Signups</th><th>Logins</th><th></th></tr></thead><tbody id="rows"></tbody></table>
+<div id="out" hidden>
+<div class="cards" id="cards"></div>
+<div class="switch" id="switch"></div>
+<div class="panel"><h2 id="bar-title">Visits by site</h2><div id="bars"></div></div>
+<div class="panel"><h2 id="line-title">Daily visits</h2><div id="line"></div></div>
+<table><thead><tr><th>Site</th><th>Visits</th><th>Clicks</th><th>Logins</th><th>Signups</th><th>Payments</th><th></th></tr></thead><tbody id="rows"></tbody></table>
+<p class="foot" id="foot"></p>
 </div></main>
 <script>
 const API="https://dciiqcoinlaradmjnkxv.supabase.co/functions/v1/site-people";
 const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjaWlxY29pbmxhcmFkbWpua3h2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM3OTE1MjksImV4cCI6MjA4OTM2NzUyOX0.wT5Eg40gCnNzNKNfIZj7ge6eDxmXL2vFr-FAw6CTqVc";
+const METRICS=[
+ ["visits","Visits","#1c1915","todayVisits"],
+ ["clicks","Clicks","#9a3412","todayClicks"],
+ ["logins","Logins","#1d4ed8","todayLogins"],
+ ["signups","Signups","#166534","todaySignups"],
+ ["payments","Payments","#7c3aed","todayPayments"]
+];
+let DATA=null, current="visits";
 const err=document.getElementById("err"), out=document.getElementById("out");
-function cell(total,today){return '<td class="n">'+total+'<span class="today">today '+today+'</span></td>';}
-function render(sites){
-  const sum=sites.reduce((a,s)=>({visits:a.visits+s.visits,signups:a.signups+s.signups,logins:a.logins+s.logins,tv:a.tv+s.todayVisits,ts:a.ts+s.todaySignups,tl:a.tl+s.todayLogins}),{visits:0,signups:0,logins:0,tv:0,ts:0,tl:0});
-  document.getElementById("totals").innerHTML='<div class="card"><b>'+sum.visits+'</b><span>Visits, today '+sum.tv+'</span></div><div class="card"><b>'+sum.signups+'</b><span>Signups, today '+sum.ts+'</span></div><div class="card"><b>'+sum.logins+'</b><span>Logins, today '+sum.tl+'</span></div>';
-  document.getElementById("rows").innerHTML=sites.map(s=>'<tr><td>'+s.site+'</td>'+cell(s.visits,s.todayVisits)+cell(s.signups,s.todaySignups)+cell(s.logins,s.todayLogins)+'<td class="note">'+(s.note||'')+'</td></tr>').join("");
+function money(cents){ if(cents==null) return ""; return " / EUR "+(cents/100).toFixed(2); }
+function cell(total, today, extra){ return '<td class="n">'+total+(extra||'')+'<span class="today">today '+today+'</span></td>'; }
+function drawBars(){
+  const meta=METRICS.filter(function(m){return m[0]===current;})[0];
+  const items=DATA.sites.slice().sort(function(a,b){return b[current]-a[current];});
+  const max=Math.max.apply(null, [1].concat(items.map(function(s){return s[current]||0;})));
+  document.getElementById("bar-title").textContent=meta[1]+" by site";
+  document.getElementById("bars").innerHTML=items.map(function(s){
+    const v=s[current]||0;
+    const w=Math.round(v/max*100);
+    return '<div class="bar-row"><span class="lab">'+s.site+'</span><span class="track"><span class="fill" style="width:'+w+'%;background:'+meta[2]+'"></span></span><span class="val">'+v+'</span></div>';
+  }).join("");
+}
+function drawLine(){
+  const meta=METRICS.filter(function(m){return m[0]===current;})[0];
+  const days=DATA.days||[];
+  document.getElementById("line-title").textContent="Daily "+meta[1].toLowerCase()+", last "+days.length+" days";
+  const w=640,h=200,pad=24;
+  const vals=days.map(function(d){return d[current]||0;});
+  const max=Math.max.apply(null, [1].concat(vals));
+  const n=Math.max(1, vals.length-1);
+  const pts=vals.map(function(v,i){
+    const x=pad+i*(w-pad*2)/n;
+    const y=h-pad-(v/max)*(h-pad*2);
+    return x.toFixed(1)+","+y.toFixed(1);
+  }).join(" ");
+  const last=days.length?days[days.length-1].day:"";
+  const first=days.length?days[0].day:"";
+  document.getElementById("line").innerHTML='<svg viewBox="0 0 '+w+' '+h+'" role="img"><line x1="'+pad+'" y1="'+(h-pad)+'" x2="'+(w-pad)+'" y2="'+(h-pad)+'" stroke="#e7e1d6"/><polyline fill="none" stroke="'+meta[2]+'" stroke-width="2.5" points="'+pts+'"/><text x="'+pad+'" y="16" font-size="12" fill="#6b645b">'+first+'</text><text x="'+(w-pad)+'" y="16" font-size="12" fill="#6b645b" text-anchor="end">'+last+'</text><text x="'+pad+'" y="'+(h-6)+'" font-size="12" fill="#6b645b">0</text><text x="'+(w-pad)+'" y="'+(h-6)+'" font-size="12" fill="#6b645b" text-anchor="end">'+max+'</text></svg>';
+}
+function render(){
+  const sites=DATA.sites||[];
+  const sum={};
+  METRICS.forEach(function(m){ sum[m[0]]=0; sum[m[3]]=0; });
+  let cents=0, centsKnown=false;
+  sites.forEach(function(s){
+    METRICS.forEach(function(m){ sum[m[0]]+=(s[m[0]]||0); sum[m[3]]+=(s[m[3]]||0); });
+    if(s.paymentCents!=null){ cents+=s.paymentCents; centsKnown=true; }
+  });
+  document.getElementById("cards").innerHTML=METRICS.map(function(m){
+    return '<div class="card" style="border-top-color:'+m[2]+'"><b>'+sum[m[0]]+'</b><span>'+m[1]+', today '+sum[m[3]]+'</span></div>';
+  }).join("");
+  document.getElementById("switch").innerHTML=METRICS.map(function(m){
+    return '<button type="button" data-m="'+m[0]+'" class="'+(m[0]===current?'on':'')+'">'+m[1]+'</button>';
+  }).join("");
+  document.getElementById("switch").onclick=function(e){
+    const m=e.target.getAttribute("data-m");
+    if(!m) return;
+    current=m; render();
+  };
+  drawBars(); drawLine();
+  document.getElementById("rows").innerHTML=sites.map(function(s){
+    const pay=(s.payments||0)+money(s.paymentCents);
+    return '<tr><td>'+s.site+'</td>'+cell(s.visits,s.todayVisits)+cell(s.clicks,s.todayClicks)+cell(s.logins,s.todayLogins)+cell(s.signups,s.todaySignups)+cell(pay,s.todayPayments)+'<td class="note">'+(s.note||'')+'</td></tr>';
+  }).join("");
+  document.getElementById("foot").textContent="Payments on record: Death Clock game 1 coin purchase (EUR 2.99), Physician Wealth 17 active subscriptions (price not stored), Direct Bookings 4 paid host plans (price not stored), Greek Cafe 3 card payments (EUR 12.50). Clicks on record: yanni.uk tool opens, Death Clock plan-button clicks, and one click per browser session from today. Dolce visits are not counted yet. calculateapr.com, the public calculator, is a different host from the counter.";
   document.getElementById("gate").hidden=true; out.hidden=false;
 }
 async function openPanel(password){
   err.textContent="";
-  const r=await fetch(API,{method:"POST",headers:{"content-type":"application/json",apikey:KEY,authorization:"Bearer "+KEY},body:JSON.stringify({action:"stats",password})});
+  const r=await fetch(API,{method:"POST",headers:{"content-type":"application/json",apikey:KEY,authorization:"Bearer "+KEY},body:JSON.stringify({action:"stats",password:password})});
   if(!r.ok){err.textContent="Wrong password";return;}
-  const data=await r.json();
+  DATA=await r.json();
   sessionStorage.setItem("people-ok",password);
-  render(data.sites||[]);
+  render();
 }
-document.getElementById("gate").addEventListener("submit",e=>{e.preventDefault();openPanel(document.getElementById("pw").value);});
+document.getElementById("gate").addEventListener("submit",function(e){e.preventDefault();openPanel(document.getElementById("pw").value);});
 const saved=sessionStorage.getItem("people-ok"); if(saved) openPanel(saved);
 </script></body></html>
