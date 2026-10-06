@@ -42,6 +42,8 @@ export default async req => {
         if (sub.status !== 'canceled') await stripe('DELETE', `subscriptions/${sub.id}`);
       }
       const store = bstore();
+      const usage = await store.list({ prefix: `use/${a.customer}/` });
+      for (const blob of usage.blobs || []) await store.delete(blob.key);
       if (a.sk_hash) await store.delete(`sk/${a.sk_hash}`);
       if (a.pk) await store.delete(`pk/${a.pk}`);
       await store.delete(`acct/${a.customer}`);
