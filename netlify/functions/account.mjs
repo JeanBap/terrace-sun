@@ -1,5 +1,5 @@
 // POST /api/account  {session_id?, action?: portal|rotate}  or Authorization: Bearer ts_sk_...
-import { acctForSecret, bget, provisionSession, stripe, stripeKey, getAcct, issueKeys, syncAcct, count, month, PLANS, ACTIVE, getCfg, PRIMARY, DAY, baseUrl } from '../../lib/billing.mjs';
+import { acctForSecret, bget, bstore, provisionSession, stripe, stripeKey, getAcct, issueKeys, syncAcct, count, month, PLANS, ACTIVE, getCfg, PRIMARY, DAY, baseUrl } from '../../lib/billing.mjs';
 
 const out = (code, body) => new Response(JSON.stringify(body), { status: code, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } });
 
@@ -34,6 +34,19 @@ export default async req => {
     } else return out(401, { error: 'sign_in', message: 'Open the link from your purchase, or paste your secret key.' });
     if (!a) return out(404, { error: 'no_account', message: 'Account not found yet. Try again in a minute.' });
 
+    if (body.action === 'delete') {
+      if (!auth) return out(401, { error: 'sign_in', message: 'Sign in with your secret key before deleting the account.' });
+      if (body.confirmation !== 'DELETE') return out(400, { error: 'confirmation_required', message: 'Type DELETE to confirm.' });
+      const subs = await stripe('GET', `subscriptions?customer=${encodeURIComponent(a.customer)}&status=all&limit=100`);
+      for (const sub of subs.data || []) {
+        if (sub.status !== 'canceled') await stripe('DELETE', `subscriptions/${sub.id}`);
+      }
+      const store = bstore();
+      if (a.sk_hash) await store.delete(`sk/${a.sk_hash}`);
+      if (a.pk) await store.delete(`pk/${a.pk}`);
+      await store.delete(`acct/${a.customer}`);
+      return out(200, { deleted: true });
+    }
     if (body.action === 'portal') {
       const cfg = await getCfg();
       const ps = await stripe('POST', 'billing_portal/sessions', { customer: a.customer, configuration: cfg?.portal_config, return_url: `${base}/account/${link ? '?session_id=' + link : ''}` });

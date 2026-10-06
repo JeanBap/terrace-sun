@@ -57,6 +57,15 @@
     var b = this; b.disabled = true; msg('Opening Stripe billing…');
     call({ action: 'portal' }).then(function (j) { location.href = j.url; }).catch(function (e) { b.disabled = false; msg(e.message, true); });
   });
+  $('deleteBtn').addEventListener('click', function () {
+    if (!sk) { msg('Sign in with your secret key before deleting the account.', true); return; }
+    var typed = window.prompt('Type DELETE to cancel billing and remove this account.');
+    if (typed !== 'DELETE') return;
+    var b = this; b.disabled = true;
+    call({ action: 'delete', confirmation: 'DELETE' }).then(function () {
+      sk = null; msg('Account deleted.'); $('acct').hidden = true; $('signin').hidden = false;
+    }).catch(function (e) { b.disabled = false; msg(e.message, true); });
+  });
   var armed = false;
   $('rotateBtn').addEventListener('click', function () {
     if (!armed) { armed = true; this.textContent = 'Click again: the old key stops working'; return; }
