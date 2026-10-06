@@ -44,8 +44,8 @@ function render(flows){
     const steps=flow.steps.map(function(s){
       const known=s.count!=null;
       let pct="";
-      if(known && prev!=null && prev>0) pct='<span class="pct">'+Math.round(s.count/prev*100)+'% of the previous counted step</span>';
-      if(known) prev=s.count;
+      if(known && prev!=null && prev>0 && s.count<=prev) pct='<span class="pct">'+Math.round(s.count/prev*100)+'% of the previous counted step</span>';
+      if(known && s.count>0) prev=s.count;
       const width=known?Math.max(s.count===0?0:4, Math.round(s.count/max*100)):0;
       const shown=known?String(s.count):"Not recorded";
       return '<div class="step"><div class="k">'+esc(s.label)+'</div><div><div class="num'+(known?"":" miss")+'">'+shown+'</div>'+(known?'<div class="bar"><span class="fill '+esc(s.stage)+'" style="width:'+width+'%"></span></div>':"")+'<div class="detail">'+esc(s.detail)+'</div>'+pct+'</div></div>';
